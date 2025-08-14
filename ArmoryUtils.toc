@@ -1,0 +1,34 @@
+## Interface-Classic: 11507
+## Interface-BCC: 20504
+## Interface-Wrath: 30403
+## Interface-Cata: 40402
+## Interface-Mists: 50500
+## Interface: 110107, 110200
+
+## Version: 1.0.1
+## Title: A|cff3FC7EBrmory|rU|cff3FC7EBtils|r by |cff3FC7EBD4KiR |T132115:16:16:0:0|t 
+## Notes: shows item level, enchants, gems
+## Author: D|cff3FC7EB4KiR |T132115:16:16:0:0|t
+## Category: D|cff3FC7EB4KiR |T132115:16:16:0:0|t
+## X-Category: D|cff3FC7EB4KiR |T132115:16:16:0:0|t
+## DefaultState: enabled
+## SavedVariables: AUTAB
+## SavedVariablesPerCharacter: AUTABPC
+## X-Curse-Project-ID: 1091858
+## X-Wago-ID: XKq90jKy
+## IconTexture: 133740
+
+libs\D4Lib\D4Lib.xml
+
+locale\enUS.lua
+locale\deDE.lua
+locale\esES.lua
+locale\frFR.lua
+locale\itIT.lua
+locale\koKR.lua
+locale\ptBR.lua
+locale\ruRU.lua
+locale\zhCN.lua
+
+itemlevel.lua
+core.lua
