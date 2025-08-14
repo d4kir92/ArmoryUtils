@@ -6,7 +6,7 @@ ArmoryUtils:OnEvent(
 	function()
 		ArmoryUtils:UnregisterEvent(auf, "PLAYER_LOGIN")
 		ArmoryUtils:SetAddonOutput("ArmoryUtils", 133740)
-		ArmoryUtils:SetVersion(133740, "1.0.0")
+		ArmoryUtils:SetVersion(133740, "1.0.1")
 		if AUTAB == nil then
 			AUTAB = AUTAB or {}
 		end
