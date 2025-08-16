@@ -2,7 +2,6 @@ local _, ArmoryUtils = ...
 local GetItemGem = (C_Item and C_Item.GetItemGem) and C_Item.GetItemGem or GetItemGem
 local AUGlowAlpha = 0.75
 local AUClassIDs = {2, 3, 4, 6, 8}
--- 15
 local AUSubClassIDs15 = {5, 6}
 local slotbry = 0
 local AUCharSlots = {"AmmoSlot", "HeadSlot", "NeckSlot", "ShoulderSlot", "ShirtSlot", "ChestSlot", "WaistSlot", "LegsSlot", "FeetSlot", "WristSlot", "HandsSlot", "Finger0Slot", "Finger1Slot", "Trinket0Slot", "Trinket1Slot", "BackSlot", "MainHandSlot", "SecondaryHandSlot", "RangedSlot", "TabardSlot",}
@@ -41,7 +40,7 @@ function ArmoryUtils:AddIlvl(SLOT, i)
     if SLOT and SLOT.auinfo == nil then
         local name = ""
         if SLOT.GetName then
-            name = ArmoryUtils:GetName(SLOT)
+            name = ArmoryUtils:GetName(SLOT) or "UID"
         end
 
         SLOT.auinfo = CreateFrame("FRAME", name .. ".auinfo", SLOT)
@@ -140,7 +139,7 @@ function ArmoryUtils:AddIlvl(SLOT, i)
             SLOT.autexth:SetPoint("BOTTOM", SLOT.auinfo, "BOTTOM", 0, slotbry)
         end
 
-        local NormalTexture = _G[ArmoryUtils:GetName(SLOT) .. "NormalTexture"]
+        local NormalTexture = SLOT.NormalTexture or _G[name .. "NormalTexture"]
         if NormalTexture then
             local sw, sh = NormalTexture:GetSize()
             SLOT.auborder:SetWidth(sw)
@@ -153,6 +152,46 @@ end
 
 function ArmoryUtils:GetAUILVL()
     return AUILVL
+end
+
+function ArmoryUtils:PDUpdateDurability()
+    if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) then
+        for i, slot in pairs(AUCharSlots) do
+            i = i - 1
+            local SLOT = _G["Character" .. slot]
+            if SLOT and SLOT.autext ~= nil and GetInventoryItemLink and SLOT.GetID and SLOT:GetID() then
+                local slotId = SLOT:GetID()
+                local Link = GetInventoryItemLink("player", slotId) or GetInventoryItemID("player", slotId)
+                if Link ~= nil and GetDetailedItemLevelInfo then
+                    local current, maximum = GetInventoryItemDurability(i)
+                    if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and current and maximum then
+                        local per = current / maximum
+                        if current == maximum then
+                            SLOT.autexth:SetTextColor(0, 1, 0, 1)
+                        elseif per == 0.0 then
+                            SLOT.autexth:SetTextColor(0, 0, 0, 1)
+                        elseif per < 0.1 then
+                            SLOT.autexth:SetTextColor(1, 0, 0, 1)
+                        elseif per < 0.3 then
+                            SLOT.autexth:SetTextColor(1, 0.65, 0, 1)
+                        elseif per < 1 then
+                            SLOT.autexth:SetTextColor(1, 1, 0, 1)
+                        end
+
+                        if current ~= maximum then
+                            SLOT.autexth:SetText(string.format("%0.0f", current / maximum * 100) .. "%")
+                        else
+                            SLOT.autexth:SetText("")
+                        end
+                    else
+                        SLOT.autexth:SetText("")
+                    end
+                else
+                    SLOT.autexth:SetText("")
+                end
+            end
+        end
+    end
 end
 
 function ArmoryUtils:PDUpdateItemInfos()
@@ -169,7 +208,6 @@ function ArmoryUtils:PDUpdateItemInfos()
                     local _, _, rarity = ArmoryUtils:GetItemInfo(Link)
                     local ilvl, _, _ = GetDetailedItemLevelInfo(Link)
                     local color = ITEM_QUALITY_COLORS[rarity]
-                    local current, maximum = GetInventoryItemDurability(i)
                     if C_TooltipInfo then
                         local tooltipData = C_TooltipInfo.GetInventoryItem("player", slotId)
                         local foundEnchant = false
@@ -240,34 +278,6 @@ function ArmoryUtils:PDUpdateItemInfos()
                         SLOT.autextg:SetText("")
                     end
 
-                    if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and current and maximum then
-                        local per = current / maximum
-                        -- 100%
-                        if current == maximum then
-                            SLOT.autexth:SetTextColor(0, 1, 0, 1)
-                        elseif per == 0.0 then
-                            -- = 0%, black
-                            SLOT.autexth:SetTextColor(0, 0, 0, 1)
-                        elseif per < 0.1 then
-                            -- < 10%, red
-                            SLOT.autexth:SetTextColor(1, 0, 0, 1)
-                        elseif per < 0.3 then
-                            -- < 30%, orange
-                            SLOT.autexth:SetTextColor(1, 0.65, 0, 1)
-                        elseif per < 1 then
-                            -- < 100%, red
-                            SLOT.autexth:SetTextColor(1, 1, 0, 1)
-                        end
-
-                        if current ~= maximum then
-                            SLOT.autexth:SetText(string.format("%0.0f", current / maximum * 100) .. "%")
-                        else
-                            SLOT.autexth:SetText("")
-                        end
-                    else
-                        SLOT.autexth:SetText("")
-                    end
-
                     if ilvl and color then
                         if slot == "AmmoSlot" then
                             local COUNT = _G["Character" .. slot .. "Count"]
@@ -302,19 +312,16 @@ function ArmoryUtils:PDUpdateItemInfos()
                             end
                         else
                             SLOT.autext:SetText("")
-                            SLOT.autexth:SetText("")
                             SLOT.autexte:SetText("")
                             SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                         end
                     else
                         SLOT.autext:SetText("")
-                        SLOT.autexth:SetText("")
                         SLOT.autexte:SetText("")
                         SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                     end
                 else
                     SLOT.autext:SetText("")
-                    SLOT.autexth:SetText("")
                     SLOT.autexte:SetText("")
                     SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                 end
@@ -353,34 +360,39 @@ function ArmoryUtils:PDUpdateItemInfos()
     end
 end
 
-function ArmoryUtils:UpdateBagsIlvl()
-    local tab = {}
-    for i = 1, 20 do
-        tinsert(tab, _G["ContainerFrame" .. i])
-    end
+local tab = {}
+for i = 1, 20 do
+    tinsert(tab, "ContainerFrame" .. i)
+end
 
+function ArmoryUtils:UpdateBagsIlvl(event)
     if ContainerFrameCombinedBags and ContainerFrameCombinedBags.ausetup == nil then
         ContainerFrameCombinedBags.ausetup = true
         ContainerFrameCombinedBags:HookScript(
             "OnShow",
             function(sel)
-                ArmoryUtils:UpdateBagsIlvl()
+                ArmoryUtils:UpdateBag(ContainerFrameCombinedBags)
             end
         )
+
+        ArmoryUtils:UpdateBag(ContainerFrameCombinedBags)
     end
 
-    for x, bag in pairs(tab) do
-        if bag.ausetup == nil then
-            bag.ausetup = true
-            bag:HookScript(
-                "OnShow",
-                function(sel)
-                    ArmoryUtils:UpdateBag(bag, x - 1)
-                end
-            )
-        end
+    for x, bagName in pairs(tab) do
+        local bag = _G[bagName]
+        if bag then
+            if bag.ausetup == nil then
+                bag.ausetup = true
+                bag:HookScript(
+                    "OnShow",
+                    function(sel)
+                        ArmoryUtils:UpdateBag(bag, x - 1)
+                    end
+                )
+            end
 
-        ArmoryUtils:UpdateBag(bag, x - 1)
+            ArmoryUtils:UpdateBag(bag, x - 1)
+        end
     end
 end
 
@@ -401,54 +413,37 @@ function ArmoryUtils:GetContainerNumSlots(bagID)
 end
 
 function ArmoryUtils:GetContainerItemLink(bagID, slotID)
+    if slotID < 0 then return nil end
     if C_Container and C_Container.GetContainerItemLink then return C_Container.GetContainerItemLink(bagID, slotID) end
 
     return GetContainerItemLink(bagID, slotID)
 end
 
--- BAGS
-function ArmoryUtils:UpdateBag(bag, id)
-    local name = ArmoryUtils:GetName(bag)
-    local bagID = bag:GetID()
-    if GetCVarBool("combinedBags") then
-        bagID = id
-    end
-
-    local size = ArmoryUtils:GetContainerNumSlots(bagID)
-    for i = 1, size do
-        local SLOT = _G[name .. "Item" .. i]
-        if GetCVarBool("combinedBags") then
-            SLOT = _G[name .. "Item" .. i]
-        end
-
-        if SLOT then
-            local slotID = size - i + 1
-            local slotLink = ArmoryUtils:GetContainerItemLink(bagID, slotID)
-            ArmoryUtils:AddIlvl(SLOT, slotID)
-            if slotLink and GetDetailedItemLevelInfo then
-                local _, _, rarity, _, _, _, _, _, _, _, _, classID, subclassID = ArmoryUtils:GetItemInfo(slotLink)
-                local ilvl, _, _ = GetDetailedItemLevelInfo(slotLink)
-                local color = ITEM_QUALITY_COLORS[rarity]
-                if ilvl and color then
-                    if ArmoryUtils:DBGV("ITEMLEVEL", true) then
-                        if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and tContains(AUClassIDs, classID) or (classID == 15 and tContains(AUSubClassIDs15, subclassID)) and ilvl and ilvl > 1 then
-                            SLOT.autext:SetText(color.hex .. ilvl)
-                        else
-                            SLOT.autext:SetText("")
-                        end
-
-                        local alpha = AUGlowAlpha
-                        if color.r == 1 and color.g == 1 and color.b == 1 then
-                            alpha = alpha - 0.2
-                        end
-
-                        if rarity and rarity > 1 and ArmoryUtils:DBGV("ITEMLEVELBORDER", true) then
-                            SLOT.auborder:SetVertexColor(color.r, color.g, color.b, alpha)
-                        else
-                            SLOT.auborder:SetVertexColor(1, 1, 1, 0)
-                        end
+function ArmoryUtils:UpdateBagItem(bagID, size, SLOT, i)
+    if SLOT then
+        local slotID = i
+        local slotLink = ArmoryUtils:GetContainerItemLink(bagID, slotID)
+        ArmoryUtils:AddIlvl(SLOT, slotID)
+        if slotLink and GetDetailedItemLevelInfo then
+            local _, _, rarity, _, _, _, _, _, _, _, _, classID, subclassID = ArmoryUtils:GetItemInfo(slotLink)
+            local ilvl, _, _ = GetDetailedItemLevelInfo(slotLink)
+            local color = ITEM_QUALITY_COLORS[rarity]
+            if ilvl and color then
+                if ArmoryUtils:DBGV("ITEMLEVEL", true) then
+                    if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and tContains(AUClassIDs, classID) or (classID == 15 and tContains(AUSubClassIDs15, subclassID)) and ilvl and ilvl > 1 then
+                        SLOT.autext:SetText(color.hex .. ilvl)
                     else
                         SLOT.autext:SetText("")
+                    end
+
+                    local alpha = AUGlowAlpha
+                    if color.r == 1 and color.g == 1 and color.b == 1 then
+                        alpha = alpha - 0.2
+                    end
+
+                    if rarity and rarity > 1 and ArmoryUtils:DBGV("ITEMLEVELBORDER", true) then
+                        SLOT.auborder:SetVertexColor(color.r, color.g, color.b, alpha)
+                    else
                         SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                     end
                 else
@@ -459,6 +454,36 @@ function ArmoryUtils:UpdateBag(bag, id)
                 SLOT.autext:SetText("")
                 SLOT.auborder:SetVertexColor(1, 1, 1, 0)
             end
+        else
+            SLOT.autext:SetText("")
+            SLOT.auborder:SetVertexColor(1, 1, 1, 0)
+        end
+    end
+end
+
+function ArmoryUtils:UpdateBag(bag, id)
+    local name = ArmoryUtils:GetName(bag)
+    local bagID = bag:GetID()
+    if GetCVarBool("combinedBags") then
+        if id and id < 5 then return end
+        bagID = bag:GetBagID()
+    end
+
+    local size = ArmoryUtils:GetContainerNumSlots(bagID)
+    if bag.Items then
+        for i, itemButton in bag:EnumerateValidItems() do
+            if itemButton then
+                ArmoryUtils:UpdateBagItem(itemButton:GetBagID(), size, itemButton, itemButton:GetID())
+            end
+        end
+    else
+        for i = 1, size do
+            local SLOT = _G[name .. "Item" .. i]
+            if GetCVarBool("combinedBags") then
+                SLOT = _G[name .. "Item" .. i]
+            end
+
+            ArmoryUtils:UpdateBagItem(bagID, size, SLOT, SLOT:GetID())
         end
     end
 end
@@ -533,38 +558,56 @@ function ArmoryUtils:IFUpdateItemInfos()
         end
 
         AUILVLINSPECT = string.format("%0.2f", sum / max)
-        if ArmoryUtils:DBGV("ITEMLEVEL", true) and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and InspectPaperDollFrame.ilvl then
+        if ArmoryUtils:DBGV("ITEMLEVEL", true) and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and InspectPaperDollFrame and InspectPaperDollFrame.ilvl then
             InspectPaperDollFrame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. AUILVLINSPECT)
         else
             InspectPaperDollFrame.ilvl:SetText("")
         end
-    elseif InspectPaperDollFrame.ilvl then
+    elseif InspectPaperDollFrame and InspectPaperDollFrame.ilvl then
         InspectPaperDollFrame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
     end
 end
 
 function ArmoryUtils:WaitForInspectFrame()
-    if InspectPaperDollFrame then
-        IFThink = CreateFrame("FRAME")
-        InspectPaperDollFrame.ilvl = InspectPaperDollFrame:CreateFontString(nil, "ARTWORK")
-        InspectPaperDollFrame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
-        InspectPaperDollFrame.ilvl:SetPoint("TOPLEFT", InspectWristSlot, "BOTTOMLEFT", 24, -15)
-        InspectPaperDollFrame.ilvl:SetText(ITEM_LEVEL_ABBR .. ": ?")
-        for i, slot in pairs(AUCharSlots) do
-            ArmoryUtils:AddIlvl(_G["Inspect" .. slot], i)
-        end
-
-        ArmoryUtils:After(0.5, ArmoryUtils.IFUpdateItemInfos, "ArmoryUtils.IFUpdateItemInfos 1")
-        ArmoryUtils:RegisterEvent(IFThink, "INSPECT_READY")
-        ArmoryUtils:OnEvent(
-            IFThink,
-            function(sel, event, slotid, ...)
-                ArmoryUtils:After(0.1, ArmoryUtils.IFUpdateItemInfos, "ArmoryUtils.IFUpdateItemInfos 2")
-            end, "IFThink"
+    if InspectPaperDollFrame == nil then
+        ArmoryUtils:After(
+            0.1,
+            function()
+                ArmoryUtils:WaitForInspectFrame()
+            end, "ArmoryUtils.IFUpdateItemInfos 2"
         )
-    else
-        ArmoryUtils:After(0.3, ArmoryUtils.WaitForInspectFrame, "ArmoryUtils.WaitForInspectFrame")
+
+        return
     end
+
+    IFThink = CreateFrame("FRAME")
+    InspectPaperDollFrame.ilvl = InspectPaperDollFrame:CreateFontString(nil, "ARTWORK")
+    InspectPaperDollFrame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
+    InspectPaperDollFrame.ilvl:SetPoint("TOPLEFT", InspectWristSlot, "BOTTOMLEFT", 24, -15)
+    InspectPaperDollFrame.ilvl:SetText(ITEM_LEVEL_ABBR .. ": ?")
+    for i, slot in pairs(AUCharSlots) do
+        ArmoryUtils:AddIlvl(_G["Inspect" .. slot], i)
+    end
+
+    ArmoryUtils:RegisterEvent(IFThink, "INSPECT_READY")
+    ArmoryUtils:OnEvent(
+        IFThink,
+        function(sel, event, slotid, ...)
+            ArmoryUtils:After(
+                0.3,
+                function()
+                    ArmoryUtils:IFUpdateItemInfos()
+                end, "ArmoryUtils.IFUpdateItemInfos 2"
+            )
+        end, "IFThink"
+    )
+
+    ArmoryUtils:After(
+        0.3,
+        function()
+            ArmoryUtils:IFUpdateItemInfos()
+        end, "ArmoryUtils.IFUpdateItemInfos 1"
+    )
 end
 
 function ArmoryUtils:InitItemLevel()
@@ -582,20 +625,51 @@ function ArmoryUtils:InitItemLevel()
             ArmoryUtils:AddIlvl(_G["Character" .. slot], i)
         end
 
-        function PDThink.Loop()
-            ArmoryUtils:PDUpdateItemInfos()
-            ArmoryUtils:After(1, PDThink.Loop, "PDThink.Loop 2")
+        if PaperDollFrame then
+            PaperDollFrame:HookScript(
+                "OnShow",
+                function()
+                    ArmoryUtils:After(
+                        0.3,
+                        function()
+                            ArmoryUtils:PDUpdateItemInfos()
+                        end, "PaperDollFrameOnShow"
+                    )
+                end
+            )
         end
 
-        ArmoryUtils:After(1, PDThink.Loop, "PDThink.Loop 1")
         ArmoryUtils:RegisterEvent(PDThink, "PLAYER_EQUIPMENT_CHANGED")
+        ArmoryUtils:RegisterEvent(PDThink, "UPDATE_INVENTORY_DURABILITY")
+        ArmoryUtils:RegisterEvent(PDThink, "UNIT_INVENTORY_CHANGED ", "player")
+        ArmoryUtils:RegisterEvent(PDThink, "ENCHANT_SPELL_COMPLETED")
         ArmoryUtils:OnEvent(
             PDThink,
-            function(sel, event, slotid, ...)
-                ArmoryUtils:PDUpdateItemInfos()
+            function(sel, event, ...)
+                if event == "PLAYER_EQUIPMENT_CHANGED" then
+                    ArmoryUtils:After(
+                        0.3,
+                        function()
+                            ArmoryUtils:PDUpdateItemInfos()
+                        end, "PLAYER_EQUIPMENT_CHANGED"
+                    )
+                elseif event == "ENCHANT_SPELL_COMPLETED" then
+                    local successful, _ = ...
+                    if successful then
+                        ArmoryUtils:After(
+                            0.4,
+                            function()
+                                ArmoryUtils:PDUpdateItemInfos()
+                            end, "ENCHANT_SPELL_COMPLETED"
+                        )
+                    end
+                end
+
+                ArmoryUtils:PDUpdateDurability()
             end, "PDThink"
         )
 
+        ArmoryUtils:PDUpdateItemInfos()
         PaperDollFrame.btn = CreateFrame("CheckButton", "PaperDollFrame" .. "btn", PaperDollFrame, "UICheckButtonTemplate")
         PaperDollFrame.btn:SetSize(20, 20)
         PaperDollFrame.btn:SetPoint("TOPLEFT", CharacterWristSlot, "BOTTOMLEFT", 6, -10)
@@ -611,7 +685,7 @@ function ArmoryUtils:InitItemLevel()
                 end
 
                 if ArmoryUtils.UpdateBagsIlvl then
-                    ArmoryUtils:UpdateBagsIlvl()
+                    ArmoryUtils:UpdateBagsIlvl("INIT")
                 end
             end
         )
@@ -632,7 +706,7 @@ function ArmoryUtils:InitItemLevel()
         ArmoryUtils:OnEvent(
             frame,
             function(sel, event)
-                ArmoryUtils:UpdateBagsIlvl()
+                ArmoryUtils:UpdateBagsIlvl(event)
             end, "UpdateBagsIlvl"
         )
 

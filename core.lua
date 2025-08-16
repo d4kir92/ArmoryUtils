@@ -6,7 +6,7 @@ ArmoryUtils:OnEvent(
 	function()
 		ArmoryUtils:UnregisterEvent(auf, "PLAYER_LOGIN")
 		ArmoryUtils:SetAddonOutput("ArmoryUtils", 133740)
-		ArmoryUtils:SetVersion(133740, "1.0.2")
+		ArmoryUtils:SetVersion(133740, "1.0.3")
 		if AUTAB == nil then
 			AUTAB = AUTAB or {}
 		end
@@ -16,9 +16,9 @@ ArmoryUtils:OnEvent(
 	end, "ArmoryUtils"
 )
 --[[
-		AddCategory("ITEMLEVEL")
-		AddCheckBox(4, "ITEMLEVELSYSTEM")
-		AddCheckBox(24, "ITEMLEVELSYSTEMSIDEWAYS", true)
-		AddCheckBox(24, "ITEMLEVELNUMBER", false, ImproveAny.UpdateILVLIcons)
-		AddCheckBox(24, "ITEMLEVELBORDER", false, ImproveAny.UpdateILVLIcons)
-		]]
+	AddCategory("ITEMLEVEL")
+	AddCheckBox(4, "ITEMLEVELSYSTEM")
+	AddCheckBox(24, "ITEMLEVELSYSTEMSIDEWAYS", true)
+	AddCheckBox(24, "ITEMLEVELNUMBER", false, ImproveAny.UpdateILVLIcons)
+	AddCheckBox(24, "ITEMLEVELBORDER", false, ImproveAny.UpdateILVLIcons)
+]]
