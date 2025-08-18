@@ -6,25 +6,17 @@ local AUSubClassIDs15 = {5, 6}
 local slotbry = 0
 local AUCharSlots = {"AmmoSlot", "HeadSlot", "NeckSlot", "ShoulderSlot", "ShirtSlot", "ChestSlot", "WaistSlot", "LegsSlot", "FeetSlot", "WristSlot", "HandsSlot", "Finger0Slot", "Finger1Slot", "Trinket0Slot", "Trinket1Slot", "BackSlot", "MainHandSlot", "SecondaryHandSlot", "RangedSlot", "TabardSlot",}
 local AUCharSlotsLeft = {}
-AUCharSlotsLeft["CharacterHeadSlot"] = true
-AUCharSlotsLeft["CharacterNeckSlot"] = true
-AUCharSlotsLeft["CharacterShoulderSlot"] = true
-AUCharSlotsLeft["CharacterBackSlot"] = true
-AUCharSlotsLeft["CharacterChestSlot"] = true
-AUCharSlotsLeft["CharacterShirtSlot"] = true
-AUCharSlotsLeft["CharacterTabardSlot"] = true
-AUCharSlotsLeft["CharacterWristSlot"] = true
-AUCharSlotsLeft["CharacterSecondaryHandSlot"] = true
+for i, x in pairs({"HeadSlot", "NeckSlot", "ShoulderSlot", "BackSlot", "ChestSlot", "ShirtSlot", "TabardSlot", "WristSlot", "SecondaryHandSlot"}) do
+    AUCharSlotsLeft["Character" .. x] = true
+    AUCharSlotsLeft["Inspect" .. x] = true
+end
+
 local AUCharSlotsRight = {}
-AUCharSlotsRight["CharacterHandsSlot"] = true
-AUCharSlotsRight["CharacterWaistSlot"] = true
-AUCharSlotsRight["CharacterLegsSlot"] = true
-AUCharSlotsRight["CharacterFeetSlot"] = true
-AUCharSlotsRight["CharacterFinger0Slot"] = true
-AUCharSlotsRight["CharacterFinger1Slot"] = true
-AUCharSlotsRight["CharacterTrinket0Slot"] = true
-AUCharSlotsRight["CharacterTrinket1Slot"] = true
-AUCharSlotsRight["CharacterMainHandSlot"] = true
+for i, x in pairs({"HandsSlot", "WaistSlot", "LegsSlot", "FeetSlot", "Finger0Slot", "Finger1Slot", "Trinket0Slot", "Trinket1Slot", "MainHandSlot"}) do
+    AUCharSlotsRight["Character" .. x] = true
+    AUCharSlotsRight["Inspect" .. x] = true
+end
+
 local fontSizeGems = 12
 local fontSizeEnchants = 8
 local PDThink = CreateFrame("FRAME")
@@ -36,7 +28,8 @@ for name, v in pairs(_G) do
     end
 end
 
-function ArmoryUtils:AddIlvl(SLOT, i)
+function ArmoryUtils:AddIlvl(prefix, SLOT, i)
+    prefix = prefix or ""
     if SLOT and SLOT.auinfo == nil then
         local name = ""
         if SLOT.GetName then
@@ -159,7 +152,7 @@ function ArmoryUtils:PDUpdateDurability()
         for i, slot in pairs(AUCharSlots) do
             i = i - 1
             local SLOT = _G["Character" .. slot]
-            if SLOT and SLOT.autext ~= nil and GetInventoryItemLink and SLOT.GetID and SLOT:GetID() then
+            if SLOT and GetInventoryItemLink and SLOT.GetID and SLOT:GetID() then
                 local slotId = SLOT:GetID()
                 local Link = GetInventoryItemLink("player", slotId) or GetInventoryItemID("player", slotId)
                 if Link ~= nil and GetDetailedItemLevelInfo then
@@ -194,22 +187,22 @@ function ArmoryUtils:PDUpdateDurability()
     end
 end
 
-function ArmoryUtils:PDUpdateItemInfos()
+function ArmoryUtils:UpdateChar(frame, unit, prefix)
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) then
         local count = 0
         local sum = 0
         for i, slot in pairs(AUCharSlots) do
             i = i - 1
-            local SLOT = _G["Character" .. slot]
-            if SLOT and SLOT.autext ~= nil and GetInventoryItemLink and SLOT.GetID and SLOT:GetID() then
+            local SLOT = _G[prefix .. slot]
+            if SLOT and GetInventoryItemLink and SLOT.GetID and SLOT:GetID() then
                 local slotId = SLOT:GetID()
-                local Link = GetInventoryItemLink("player", slotId) or GetInventoryItemID("player", slotId)
+                local Link = GetInventoryItemLink(unit, slotId) or GetInventoryItemID(unit, slotId)
                 if Link ~= nil and GetDetailedItemLevelInfo then
                     local _, _, rarity = ArmoryUtils:GetItemInfo(Link)
                     local ilvl, _, _ = GetDetailedItemLevelInfo(Link)
                     local color = ITEM_QUALITY_COLORS[rarity]
                     if C_TooltipInfo then
-                        local tooltipData = C_TooltipInfo.GetInventoryItem("player", slotId)
+                        local tooltipData = C_TooltipInfo.GetInventoryItem(unit, slotId)
                         local foundEnchant = false
                         if tooltipData ~= nil then
                             local gems = {}
@@ -330,8 +323,8 @@ function ArmoryUtils:PDUpdateItemInfos()
 
         if count > 0 then
             local max = 16 -- when only AUnhand
-            if GetInventoryItemID("PLAYER", 17) then
-                local t1 = ArmoryUtils:GetItemInfo(GetInventoryItemLink("PLAYER", 17))
+            if GetInventoryItemID(unit, 17) then
+                local t1 = ArmoryUtils:GetItemInfo(GetInventoryItemLink(unit, 17))
                 -- when 2x 1handed
                 if t1 then
                     max = 17
@@ -343,21 +336,25 @@ function ArmoryUtils:PDUpdateItemInfos()
             end
 
             AUILVL = string.format("%0.2f", sum / max)
-            if PaperDollFrame.ilvl then
+            if frame.ilvl then
                 if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                    PaperDollFrame.ilvl:SetText("")
+                    frame.ilvl:SetText("")
                 else
-                    PaperDollFrame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
+                    frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
                 end
             end
-        elseif PaperDollFrame.ilvl then
+        elseif frame.ilvl then
             if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                PaperDollFrame.ilvl:SetText("")
+                frame.ilvl:SetText("")
             else
-                PaperDollFrame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
+                frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
             end
         end
     end
+end
+
+function ArmoryUtils:PDUpdateItemInfos()
+    ArmoryUtils:UpdateChar(PaperDollFrame, "player", "Character")
 end
 
 local tab = {}
@@ -423,7 +420,7 @@ function ArmoryUtils:UpdateBagItem(bagID, size, SLOT, i)
     if SLOT then
         local slotID = i
         local slotLink = ArmoryUtils:GetContainerItemLink(bagID, slotID)
-        ArmoryUtils:AddIlvl(SLOT, slotID)
+        ArmoryUtils:AddIlvl(nil, SLOT, slotID)
         if slotLink and GetDetailedItemLevelInfo then
             local _, _, rarity, _, _, _, _, _, _, _, _, classID, subclassID = ArmoryUtils:GetItemInfo(slotLink)
             local ilvl, _, _ = GetDetailedItemLevelInfo(slotLink)
@@ -495,77 +492,7 @@ function ArmoryUtils:CheckInspectSlot(slot)
 end
 
 function ArmoryUtils:IFUpdateItemInfos()
-    local count = 0
-    local sum = 0
-    for i, slot in pairs(AUCharSlots) do
-        local SLOT = _G["Inspect" .. slot]
-        if SLOT and SLOT.autext ~= nil and GetInventoryItemLink then
-            local ItemID = GetInventoryItemLink("TARGET", SLOT:GetID()) --GetInventoryItemID("PLAYER", SLOT:GetID())
-            if ItemID and GetDetailedItemLevelInfo then
-                local _, _, rarity = ArmoryUtils:GetItemInfo(ItemID)
-                local ilvl, _, _ = GetDetailedItemLevelInfo(ItemID)
-                local color = ITEM_QUALITY_COLORS[rarity]
-                if ArmoryUtils:DBGV("ITEMLEVEL", true) and ilvl and color then
-                    -- ignore: shirt, tabard, ammo
-                    if ArmoryUtils:CheckInspectSlot(slot) and ilvl and ilvl > 1 then
-                        count = count + 1
-                        sum = sum + ilvl
-                    end
-
-                    if ArmoryUtils:DBGV("ITEMLEVEL", true) then
-                        if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and ilvl and ilvl > 1 then
-                            SLOT.autext:SetText(color.hex .. ilvl)
-                        end
-
-                        local alpha = AUGlowAlpha
-                        if color.r == 1 and color.g == 1 and color.b == 1 then
-                            alpha = alpha - 0.2
-                        end
-
-                        if rarity and rarity > 1 and ArmoryUtils:DBGV("ITEMLEVELBORDER", true) then
-                            SLOT.auborder:SetVertexColor(color.r, color.g, color.b, alpha)
-                        else
-                            SLOT.auborder:SetVertexColor(1, 1, 1, 0)
-                        end
-                    else
-                        SLOT.autext:SetText("")
-                        SLOT.auborder:SetVertexColor(1, 1, 1, 0)
-                    end
-                else
-                    SLOT.autext:SetText("")
-                    SLOT.auborder:SetVertexColor(1, 1, 1, 0)
-                end
-            else
-                SLOT.autext:SetText("")
-                SLOT.auborder:SetVertexColor(1, 1, 1, 0)
-            end
-        end
-    end
-
-    if count > 0 then
-        local max = 16 -- when only Mainhand
-        local ItemID = GetInventoryItemLink("TARGET", 17)
-        if GetItemInfo and GetInventoryItemID and ItemID ~= nil then
-            local t1 = ArmoryUtils:GetItemInfo(ItemID)
-            -- when 2x 1handed
-            if t1 then
-                max = 17
-            end
-        end
-
-        if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-            max = max - 1
-        end
-
-        AUILVLINSPECT = string.format("%0.2f", sum / max)
-        if ArmoryUtils:DBGV("ITEMLEVEL", true) and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and InspectPaperDollFrame and InspectPaperDollFrame.ilvl then
-            InspectPaperDollFrame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. AUILVLINSPECT)
-        else
-            InspectPaperDollFrame.ilvl:SetText("")
-        end
-    elseif InspectPaperDollFrame and InspectPaperDollFrame.ilvl then
-        InspectPaperDollFrame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
-    end
+    ArmoryUtils:UpdateChar(InspectPaperDollFrame, "target", "Inspect")
 end
 
 function ArmoryUtils:WaitForInspectFrame()
@@ -586,7 +513,7 @@ function ArmoryUtils:WaitForInspectFrame()
     InspectPaperDollFrame.ilvl:SetPoint("TOPLEFT", InspectWristSlot, "BOTTOMLEFT", 24, -15)
     InspectPaperDollFrame.ilvl:SetText(ITEM_LEVEL_ABBR .. ": ?")
     for i, slot in pairs(AUCharSlots) do
-        ArmoryUtils:AddIlvl(_G["Inspect" .. slot], i)
+        ArmoryUtils:AddIlvl("Inspect", _G["Inspect" .. slot], i)
     end
 
     ArmoryUtils:RegisterEvent(IFThink, "INSPECT_READY")
@@ -622,7 +549,7 @@ function ArmoryUtils:InitItemLevel()
         end
 
         for i, slot in pairs(AUCharSlots) do
-            ArmoryUtils:AddIlvl(_G["Character" .. slot], i)
+            ArmoryUtils:AddIlvl("Character", _G["Character" .. slot], i)
         end
 
         if PaperDollFrame then
