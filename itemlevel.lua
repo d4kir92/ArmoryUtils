@@ -260,11 +260,14 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix)
                                 end
 
                                 SLOT.autextg:SetText(text)
+                            else
+                                SLOT.autextg:SetText("")
                             end
                         end
 
                         if not foundEnchant then
                             SLOT.autexte:SetText("")
+                            SLOT.autextg:SetText("")
                         end
                     else
                         SLOT.autexte:SetText("")
@@ -306,16 +309,19 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix)
                         else
                             SLOT.autext:SetText("")
                             SLOT.autexte:SetText("")
+                            SLOT.autextg:SetText("")
                             SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                         end
                     else
                         SLOT.autext:SetText("")
                         SLOT.autexte:SetText("")
+                        SLOT.autextg:SetText("")
                         SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                     end
                 else
                     SLOT.autext:SetText("")
                     SLOT.autexte:SetText("")
+                    SLOT.autextg:SetText("")
                     SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                 end
             end
