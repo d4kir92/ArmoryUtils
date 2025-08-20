@@ -261,13 +261,12 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix)
 
                                 SLOT.autextg:SetText(text)
                             else
-                                SLOT.autextg:SetText("")
+                                SLOT.autextg:SetText("ELSE 1")
                             end
                         end
 
                         if not foundEnchant then
                             SLOT.autexte:SetText("")
-                            SLOT.autextg:SetText("")
                         end
                     else
                         SLOT.autexte:SetText("")
