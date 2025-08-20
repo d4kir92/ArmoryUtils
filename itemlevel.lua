@@ -261,7 +261,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix)
 
                                 SLOT.autextg:SetText(text)
                             else
-                                SLOT.autextg:SetText("ELSE 1")
+                                SLOT.autextg:SetText("")
                             end
                         end
 
