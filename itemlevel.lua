@@ -187,7 +187,7 @@ function ArmoryUtils:PDUpdateDurability()
     end
 end
 
-function ArmoryUtils:UpdateChar(frame, unit, prefix)
+function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) then
         local count = 0
         local sum = 0
@@ -290,7 +290,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix)
                             sum = sum + ilvl
                         end
 
-                        if ArmoryUtils:DBGV("ITEMLEVEL", true) then
+                        if ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true) then
                             if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and ilvl and ilvl > 1 then
                                 SLOT.autext:SetText(color.hex .. ilvl)
                             end
@@ -326,6 +326,24 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix)
             end
         end
 
+        if frame.ilvlbtn == nil then
+            frame.ilvlbtn = ArmoryUtils:CreateCheckButton(ArmoryUtils:GetName(frame) .. ".ilvlbtn", frame)
+            frame.ilvlbtn:SetSize(20, 20)
+            frame.ilvlbtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 6, 10)
+            frame.ilvlbtn:SetScript(
+                "OnClick",
+                function(sel)
+                    local newval = sel:GetChecked()
+                    ArmoryUtils:DBSV("ITEMLEVEL" .. unit, newval)
+                    func()
+                    if ArmoryUtils.UpdateBagsIlvl then
+                        ArmoryUtils:UpdateBagsIlvl("INIT")
+                    end
+                end
+            )
+        end
+
+        frame.ilvlbtn:SetChecked(ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true))
         if count > 0 then
             local max = 16 -- when only AUnhand
             if GetInventoryItemID(unit, 17) then
@@ -359,7 +377,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix)
 end
 
 function ArmoryUtils:PDUpdateItemInfos()
-    ArmoryUtils:UpdateChar(PaperDollFrame, "player", "Character")
+    ArmoryUtils:UpdateChar(PaperDollFrame, "player", "Character", ArmoryUtils.PDUpdateItemInfos)
 end
 
 local tab = {}
@@ -497,7 +515,7 @@ function ArmoryUtils:CheckInspectSlot(slot)
 end
 
 function ArmoryUtils:IFUpdateItemInfos()
-    ArmoryUtils:UpdateChar(InspectPaperDollFrame, "target", "Inspect")
+    ArmoryUtils:UpdateChar(InspectPaperDollFrame, "target", "Inspect", ArmoryUtils.IFUpdateItemInfos)
 end
 
 function ArmoryUtils:WaitForInspectFrame()
@@ -602,26 +620,6 @@ function ArmoryUtils:InitItemLevel()
         )
 
         ArmoryUtils:PDUpdateItemInfos()
-        PaperDollFrame.btn = CreateFrame("CheckButton", "PaperDollFrame" .. "btn", PaperDollFrame, "UICheckButtonTemplate")
-        PaperDollFrame.btn:SetSize(20, 20)
-        PaperDollFrame.btn:SetPoint("TOPLEFT", CharacterWristSlot, "BOTTOMLEFT", 6, -10)
-        PaperDollFrame.btn:SetChecked(ArmoryUtils:DBGV("ITEMLEVEL", true))
-        PaperDollFrame.btn:SetScript(
-            "OnClick",
-            function(sel)
-                local newval = sel:GetChecked()
-                ArmoryUtils:DBSV("ITEMLEVEL", newval)
-                ArmoryUtils:PDUpdateItemInfos()
-                if ArmoryUtils.IFUpdateItemInfos then
-                    ArmoryUtils:IFUpdateItemInfos()
-                end
-
-                if ArmoryUtils.UpdateBagsIlvl then
-                    ArmoryUtils:UpdateBagsIlvl("INIT")
-                end
-            end
-        )
-
         ArmoryUtils:WaitForInspectFrame()
         local frame = CreateFrame("FRAME")
         ArmoryUtils:RegisterEvent(frame, "BAG_OPEN")
