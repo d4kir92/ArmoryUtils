@@ -1,5 +1,5 @@
 local _, ArmoryUtils = ...
-local GetItemGem = (C_Item and C_Item.GetItemGem) and C_Item.GetItemGem or GetItemGem
+local ITEM_LEVEL_ABBR = ITEM_LEVEL_ABBR or "ilvl"
 local AUGlowAlpha = 0.75
 local AUClassIDs = {2, 3, 4, 6, 8}
 local AUSubClassIDs15 = {5, 6}
@@ -42,16 +42,16 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
         SLOT.auinfo:SetFrameLevel(200)
         SLOT.auinfo:EnableMouse(false)
         SLOT.autext = SLOT.auinfo:CreateFontString(nil, "OVERLAY")
-        SLOT.autext:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
+        SLOT.autext:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
         SLOT.autext:SetShadowOffset(1, -1)
         SLOT.autexth = SLOT.auinfo:CreateFontString(nil, "OVERLAY")
-        SLOT.autexth:SetFont(STANDARD_TEXT_FONT, 9, "THINOUTLINE")
+        SLOT.autexth:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
         SLOT.autexth:SetShadowOffset(1, -1)
         SLOT.autexte = SLOT.auinfo:CreateFontString(nil, "OVERLAY")
-        SLOT.autexte:SetFont(STANDARD_TEXT_FONT, fontSizeEnchants, "THINOUTLINE")
+        SLOT.autexte:SetFont(STANDARD_TEXT_FONT, fontSizeEnchants, "OUTLINE")
         SLOT.autexte:SetShadowOffset(1, -1)
         SLOT.autextg = SLOT.auinfo:CreateFontString(nil, "OVERLAY")
-        SLOT.autextg:SetFont(STANDARD_TEXT_FONT, fontSizeGems, "THINOUTLINE")
+        SLOT.autextg:SetFont(STANDARD_TEXT_FONT, fontSizeGems, "OUTLINE")
         SLOT.autextg:SetShadowOffset(1, -1)
         SLOT.auborder = SLOT.auinfo:CreateTexture("SLOT.auborder", "OVERLAY")
         SLOT.auborder:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
@@ -155,7 +155,7 @@ function ArmoryUtils:PDUpdateDurability()
             if SLOT and GetInventoryItemLink and SLOT.GetID and SLOT:GetID() then
                 local slotId = SLOT:GetID()
                 local Link = GetInventoryItemLink("player", slotId) or GetInventoryItemID("player", slotId)
-                if Link ~= nil and GetDetailedItemLevelInfo then
+                if Link ~= nil then
                     local current, maximum = GetInventoryItemDurability(i)
                     if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and current and maximum then
                         local per = current / maximum
@@ -197,21 +197,19 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             if SLOT and GetInventoryItemLink and SLOT.GetID and SLOT:GetID() then
                 local slotId = SLOT:GetID()
                 local Link = GetInventoryItemLink(unit, slotId) or GetInventoryItemID(unit, slotId)
-                if Link ~= nil and GetDetailedItemLevelInfo then
+                if Link ~= nil then
                     local _, _, rarity = ArmoryUtils:GetItemInfo(Link)
-                    local ilvl, _, _ = GetDetailedItemLevelInfo(Link)
+                    local ilvl, _, _ = ArmoryUtils:GetDetailedItemLevelInfo(Link)
                     local color = ITEM_QUALITY_COLORS[rarity]
                     if C_TooltipInfo then
                         local tooltipData = C_TooltipInfo.GetInventoryItem(unit, slotId)
                         local foundEnchant = false
                         if tooltipData ~= nil then
                             local gems = {}
-                            if GetItemGem then
-                                for gid = 1, 4 do
-                                    local gemLink = select(2, GetItemGem(Link, gid))
-                                    if gemLink then
-                                        tinsert(gems, gemLink)
-                                    end
+                            for gid = 1, 4 do
+                                local gemLink = select(2, ArmoryUtils:GetItemGem(Link, gid))
+                                if gemLink then
+                                    tinsert(gems, gemLink)
                                 end
                             end
 
@@ -235,7 +233,6 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
 
                                 for index, name in pairs(emptySockets) do
                                     if string.find(text, name) then
-                                        foundGem = true
                                         local gemString = string.match(text, name:gsub("%%s", "(.*)"))
                                         tinsert(gems, gemString)
                                     end
@@ -249,12 +246,12 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                                         text = text .. "  "
                                     end
 
-                                    local item = GetItemInfo(gem)
+                                    local item = ArmoryUtils:GetItemInfo(gem)
                                     if item == nil then
                                         text = text .. "|T" .. "Interface/ItemsocketingFrame/UI-EmptySocket-Prismatic" .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|t"
                                     else
-                                        local icon = select(10, GetItemInfo(gem))
-                                        local classID = select(12, GetItemInfo(gem))
+                                        local icon = select(10, ArmoryUtils:GetItemInfo(gem))
+                                        local classID = select(12, ArmoryUtils:GetItemInfo(gem))
                                         text = text .. "|T" .. icon .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|t|A:" .. "Professions-ChatIcon-Quality-Tier" .. classID .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|a"
                                     end
                                 end
@@ -326,10 +323,17 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             end
         end
 
-        if frame.ilvlbtn == nil then
+        local wristSlot = getglobal(prefix .. "WristSlot")
+        if wristSlot == nil then return end
+        if frame.ilvlbtn == nil and ArmoryUtils:GetName(frame) then
             frame.ilvlbtn = ArmoryUtils:CreateCheckButton(ArmoryUtils:GetName(frame) .. ".ilvlbtn", frame)
             frame.ilvlbtn:SetSize(20, 20)
-            frame.ilvlbtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 6, 10)
+            if ArmoryUtils:GetWoWBuild() == "RETAIL" then
+                frame.ilvlbtn:SetPoint("LEFT", wristSlot, "BOTTOMLEFT", -2, -24)
+            else
+                frame.ilvlbtn:SetPoint("LEFT", wristSlot, "BOTTOMLEFT", -2, -26)
+            end
+
             frame.ilvlbtn:SetScript(
                 "OnClick",
                 function(sel)
@@ -341,6 +345,18 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     end
                 end
             )
+        end
+
+        if frame.ilvl == nil then
+            frame.ilvl = PaperDollFrame:CreateFontString(nil, "ARTWORK")
+            frame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
+            if ArmoryUtils:GetWoWBuild() == "RETAIL" then
+                frame.ilvl:SetPoint("LEFT", wristSlot, "BOTTOMLEFT", 18, -24)
+            else
+                frame.ilvl:SetPoint("LEFT", wristSlot, "BOTTOMLEFT", 18, -26)
+            end
+
+            frame.ilvl:SetText(ITEM_LEVEL_ABBR .. ": ?")
         end
 
         frame.ilvlbtn:SetChecked(ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true))
@@ -360,18 +376,10 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
 
             AUILVL = string.format("%0.2f", sum / max)
             if frame.ilvl then
-                if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                    frame.ilvl:SetText("")
-                else
-                    frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
-                end
+                frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
             end
         elseif frame.ilvl then
-            if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                frame.ilvl:SetText("")
-            else
-                frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
-            end
+            frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
         end
     end
 end
@@ -416,37 +424,14 @@ function ArmoryUtils:UpdateBagsIlvl(event)
     end
 end
 
-function ArmoryUtils:GetContainerNumSlots(bagID)
-    local cur = 0
-    if C_Container and C_Container.GetContainerNumSlots then
-        cur = C_Container.GetContainerNumSlots(bagID)
-    else
-        cur = GetContainerNumSlots(bagID)
-    end
-
-    local max = cur
-    if bagID == 0 and not IsAccountSecured() then
-        max = cur + 4
-    end
-
-    return max, cur
-end
-
-function ArmoryUtils:GetContainerItemLink(bagID, slotID)
-    if slotID < 0 then return nil end
-    if C_Container and C_Container.GetContainerItemLink then return C_Container.GetContainerItemLink(bagID, slotID) end
-
-    return GetContainerItemLink(bagID, slotID)
-end
-
 function ArmoryUtils:UpdateBagItem(bagID, size, SLOT, i)
     if SLOT then
         local slotID = i
         local slotLink = ArmoryUtils:GetContainerItemLink(bagID, slotID)
         ArmoryUtils:AddIlvl(nil, SLOT, slotID)
-        if slotLink and GetDetailedItemLevelInfo then
+        if slotLink then
             local _, _, rarity, _, _, _, _, _, _, _, _, classID, subclassID = ArmoryUtils:GetItemInfo(slotLink)
-            local ilvl, _, _ = GetDetailedItemLevelInfo(slotLink)
+            local ilvl, _, _ = ArmoryUtils:GetDetailedItemLevelInfo(slotLink)
             local color = ITEM_QUALITY_COLORS[rarity]
             if ilvl and color then
                 if ArmoryUtils:DBGV("ITEMLEVEL", true) then
@@ -531,10 +516,6 @@ function ArmoryUtils:WaitForInspectFrame()
     end
 
     IFThink = CreateFrame("FRAME")
-    InspectPaperDollFrame.ilvl = InspectPaperDollFrame:CreateFontString(nil, "ARTWORK")
-    InspectPaperDollFrame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
-    InspectPaperDollFrame.ilvl:SetPoint("TOPLEFT", InspectWristSlot, "BOTTOMLEFT", 24, -15)
-    InspectPaperDollFrame.ilvl:SetText(ITEM_LEVEL_ABBR .. ": ?")
     for i, slot in pairs(AUCharSlots) do
         ArmoryUtils:AddIlvl("Inspect", _G["Inspect" .. slot], i)
     end
@@ -562,15 +543,6 @@ end
 
 function ArmoryUtils:InitItemLevel()
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) and PaperDollFrame then
-        PaperDollFrame.ilvl = PaperDollFrame:CreateFontString(nil, "ARTWORK")
-        PaperDollFrame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
-        PaperDollFrame.ilvl:SetPoint("TOPLEFT", CharacterWristSlot, "BOTTOMLEFT", 24, -15)
-        if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-            PaperDollFrame.ilvl:SetText("")
-        else
-            PaperDollFrame.ilvl:SetText(ITEM_LEVEL_ABBR .. ": ?")
-        end
-
         for i, slot in pairs(AUCharSlots) do
             ArmoryUtils:AddIlvl("Character", _G["Character" .. slot], i)
         end
@@ -686,6 +658,7 @@ function ArmoryUtils:InitItemLevel()
             "OnClick",
             function(sel, ...)
                 PlaySound(SOUNDKIT.UI_BAG_SORTING_01)
+                local SortBags = getglobal("SortBags")
                 if SortBags then
                     SortBags()
                 elseif C_Container and C_Container.SortBags then
@@ -698,7 +671,7 @@ function ArmoryUtils:InitItemLevel()
             "OnEnter",
             function(sel, ...)
                 if sel then
-                    GameTooltip:SetOwner(sel)
+                    GameTooltip:SetOwner(sel, "ANCHOR_TOPLEFT")
                     GameTooltip:SetText(BAG_CLEANUP_BAGS)
                     GameTooltip:Show()
                 end

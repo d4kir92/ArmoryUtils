@@ -1,4 +1,7 @@
 local _, D4 = ...
+local CreateFrame = getglobal("CreateFrame")
+local InCombatLockdown = getglobal("InCombatLockdown")
+local GetCursorPosition = getglobal("GetCursorPosition")
 local deg, atan2 = math.deg, math.atan2
 local rad, cos, sin, sqrt, max, min = math.rad, math.cos, math.sin, math.sqrt, math.max, math.min
 local mmShapes = {
@@ -32,6 +35,7 @@ function D4:UpdatePosition(button, position, parent)
         q = q + 2
     end
 
+    local GetMinimapShape = getglobal("GetMinimapShape")
     local minimapShape = GetMinimapShape and GetMinimapShape() or "ROUND"
     local qt = mmShapes[minimapShape]
     local w = (Minimap:GetWidth() / 2) + button:GetWidth() / 2 - button:GetWidth() / 5
@@ -65,7 +69,7 @@ function D4:UpdatePosition(button, position, parent)
 end
 
 function D4:GetMMBtn(name)
-    return _G[name]
+    return getglobal(name)
 end
 
 if GetD4MinimapHover == nil then
@@ -284,10 +288,19 @@ function D4:CreateMinimapButton(params)
     local animOut = btn.fadeOut:CreateAnimation("Alpha")
     animOut:SetOrder(1)
     animOut:SetDuration(0.2)
-    animOut:SetFromAlpha(1)
-    animOut:SetToAlpha(0)
+    if animOut.SetFromAlpha then
+        animOut:SetFromAlpha(1)
+    end
+
+    if animOut.SetToAlpha then
+        animOut:SetToAlpha(0)
+    end
+
     animOut:SetStartDelay(1)
-    btn.fadeOut:SetToFinalAlpha(true)
+    if animOut.fadeOut and animOut.fadeOut.SetToFinalAlpha then
+        btn.fadeOut:SetToFinalAlpha(true)
+    end
+
     btn.ia_visible = false
     local function BtnThink()
         if btn.ia_visible_old ~= GetD4MinimapHover() then
@@ -384,6 +397,7 @@ function D4:HideMMBtn(name)
 end
 
 function D4:UpdateLTP()
+    local LeaPlusDB = getglobal("LeaPlusDB")
     local MinimapModder = LeaPlusDB and LeaPlusDB["MinimapModder"] and LeaPlusDB["MinimapModder"] == "On"
     if MinimapModder then
         local CombineAddonButtons = LeaPlusDB["CombineAddonButtons"] == "On"
