@@ -1013,10 +1013,15 @@ function D4:GetFrameByName(name)
     end
 
     local baseName, index = name:match("([^%[]+)%[(%d+)%]")
-    if baseName and index then
+    if baseName and index and index ~= nil then
+        if type(index) == "string" then
+            index = tonumber(index)
+        end
+
+        if type(index) ~= "number" then return nil end
         local f = _G[baseName]
 
-        return f and select(tonumber(index), f:GetRegions()) or nil
+        return f and select(index, f:GetRegions()) or nil
     end
 
     return nil

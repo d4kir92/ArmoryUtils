@@ -506,7 +506,7 @@ end
 function ArmoryUtils:WaitForInspectFrame()
     if InspectPaperDollFrame == nil then
         ArmoryUtils:After(
-            0.1,
+            0.16,
             function()
                 ArmoryUtils:WaitForInspectFrame()
             end, "ArmoryUtils.IFUpdateItemInfos 2"
@@ -525,7 +525,7 @@ function ArmoryUtils:WaitForInspectFrame()
         IFThink,
         function(sel, event, slotid, ...)
             ArmoryUtils:After(
-                0.3,
+                0.31,
                 function()
                     ArmoryUtils:IFUpdateItemInfos()
                 end, "ArmoryUtils.IFUpdateItemInfos 2"
@@ -534,7 +534,7 @@ function ArmoryUtils:WaitForInspectFrame()
     )
 
     ArmoryUtils:After(
-        0.3,
+        0.32,
         function()
             ArmoryUtils:IFUpdateItemInfos()
         end, "ArmoryUtils.IFUpdateItemInfos 1"
@@ -552,7 +552,7 @@ function ArmoryUtils:InitItemLevel()
                 "OnShow",
                 function()
                     ArmoryUtils:After(
-                        0.3,
+                        0.33,
                         function()
                             ArmoryUtils:PDUpdateItemInfos()
                         end, "PaperDollFrameOnShow"
@@ -570,7 +570,7 @@ function ArmoryUtils:InitItemLevel()
             function(sel, event, ...)
                 if event == "PLAYER_EQUIPMENT_CHANGED" then
                     ArmoryUtils:After(
-                        0.3,
+                        0.34,
                         function()
                             ArmoryUtils:PDUpdateItemInfos()
                         end, "PLAYER_EQUIPMENT_CHANGED"
@@ -579,7 +579,7 @@ function ArmoryUtils:InitItemLevel()
                     local successful, _ = ...
                     if successful then
                         ArmoryUtils:After(
-                            0.4,
+                            0.41,
                             function()
                                 ArmoryUtils:PDUpdateItemInfos()
                             end, "ENCHANT_SPELL_COMPLETED"
