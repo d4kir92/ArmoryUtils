@@ -2,10 +2,10 @@
 ## Interface-BCC: 20504
 ## Interface-Wrath: 30300, 30403
 ## Interface-Cata: 40402
-## Interface-Mists: 50500
+## Interface-Mists: 50501
 ## Interface: 110200
 
-## Version: 1.1.8
+## Version: 1.1.9
 ## Title: A|cff3FC7EBrmory|rU|cff3FC7EBtils|r by |cff3FC7EBD4KiR |T132115:16:16:0:0|t 
 ## Notes: shows item level, enchants, gems.
 ## Notes-deDE: Zeigt die Stufe des Gegenstands, Verzauberungen und Edelsteine an.
