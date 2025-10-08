@@ -15,10 +15,3 @@ ArmoryUtils:OnEvent(
 		ArmoryUtils:InitItemLevel()
 	end, "ArmoryUtils"
 )
---[[
-	AddCategory("ITEMLEVEL")
-	AddCheckBox(4, "ITEMLEVELSYSTEM")
-	AddCheckBox(24, "ITEMLEVELSYSTEMSIDEWAYS", true)
-	AddCheckBox(24, "ITEMLEVELNUMBER", false, ImproveAny.UpdateILVLIcons)
-	AddCheckBox(24, "ITEMLEVELBORDER", false, ImproveAny.UpdateILVLIcons)
-]]
