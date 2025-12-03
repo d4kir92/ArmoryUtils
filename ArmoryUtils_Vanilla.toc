@@ -1,5 +1,5 @@
 ## Interface: 11508
-## Version: 1.1.14
+## Version: 1.1.15
 ## Title: A|cff3FC7EBrmory|rU|cff3FC7EBtils|r |T134952:16:16:0:0|t by |cff3FC7EBD4KiR |T132115:16:16:0:0|t 
 ## Notes: shows item level, enchants, gems.
 ## Notes-deDE: Zeigt die Stufe des Gegenstands, Verzauberungen und Edelsteine an.
