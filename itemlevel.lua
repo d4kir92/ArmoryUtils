@@ -28,6 +28,38 @@ for name, v in pairs(_G) do
     end
 end
 
+local ilvlTexts = {}
+function ArmoryUtils:AddIlvlText(text)
+    tinsert(ilvlTexts, text)
+end
+
+local sideTexts = {}
+function ArmoryUtils:AddSideText(text)
+    tinsert(sideTexts, text)
+end
+
+function ArmoryUtils:UpdateFonts()
+    if AUTAB["ILVLFONTSIZE"] == nil then
+        AUTAB["ILVLFONTSIZE"] = 11
+    end
+
+    if AUTAB["SIDEFONTSIZE"] == nil then
+        AUTAB["SIDEFONTSIZE"] = 11
+    end
+
+    local fs1 = AUTAB["ILVLFONTSIZE"]
+    for i, text in pairs(ilvlTexts) do
+        local font, _, flags = text:GetFont()
+        text:SetFont(font, fs1, flags)
+    end
+
+    local fs2 = AUTAB["SIDEFONTSIZE"]
+    for i, text in pairs(sideTexts) do
+        local font, _, flags = text:GetFont()
+        text:SetFont(font, fs2, flags)
+    end
+end
+
 function ArmoryUtils:AddIlvl(prefix, SLOT, i)
     prefix = prefix or ""
     if SLOT and SLOT.auinfo == nil then
@@ -57,6 +89,9 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
         SLOT.auborder:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
         SLOT.auborder:SetBlendMode("ADD")
         SLOT.auborder:SetAlpha(1)
+        ArmoryUtils:AddIlvlText(SLOT.autext)
+        ArmoryUtils:AddSideText(SLOT.autexte)
+        ArmoryUtils:AddSideText(SLOT.autextg)
         local px = 8
         if false and ArmoryUtils:DBGV("ITEMLEVELSYSTEMSIDEWAYS", true) then
             slotbry = 2
@@ -80,7 +115,7 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
                 SLOT.autextg:SetPoint("CENTER", SLOT.auinfo, "CENTER", 0, slotbry)
             end
         else
-            slotbry = 6
+            slotbry = 3
             if AUCharSlotsLeft[name] then
                 if i == 17 or i == 18 then
                     SLOT.autexte:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
@@ -541,6 +576,74 @@ function ArmoryUtils:WaitForInspectFrame()
     )
 end
 
+local au_settings = nil
+function ArmoryUtils:ToggleSettings()
+    if au_settings then
+        if au_settings:IsShown() then
+            au_settings:Hide()
+        else
+            au_settings:Show()
+        end
+    end
+end
+
+function ArmoryUtils:InitSettings()
+    AUTAB = AUTAB or {}
+    au_settings = ArmoryUtils:CreateWindow(
+        {
+            ["name"] = "ArmoryUtils",
+            ["pTab"] = {"CENTER"},
+            ["sw"] = 520,
+            ["sh"] = 520,
+            ["title"] = format("|T134952:16:16:0:0|t A|cff3FC7EBrmory|rU|cff3FC7EBtils|r v|cff3FC7EB%s", ArmoryUtils:GetVersion())
+        }
+    )
+
+    local x = 15
+    local y = 10
+    ArmoryUtils:SetAppendX(x)
+    ArmoryUtils:SetAppendY(y)
+    ArmoryUtils:SetAppendParent(au_settings)
+    ArmoryUtils:SetAppendTab(AUTAB)
+    ArmoryUtils:AppendCategory("GENERAL")
+    ArmoryUtils:AppendCheckbox(
+        "SHOWMINIMAPBUTTON",
+        ArmoryUtils:GetWoWBuild() ~= "RETAIL",
+        function()
+            if ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ArmoryUtils:GetWoWBuild() ~= "RETAIL") then
+                ArmoryUtils:ShowMMBtn("ArmoryUtils")
+            else
+                ArmoryUtils:HideMMBtn("ArmoryUtils")
+            end
+        end
+    )
+
+    ArmoryUtils:AppendCategory("TEXTSIZES")
+    ArmoryUtils:AppendSlider(
+        "ILVLFONTSIZE",
+        11,
+        6,
+        18,
+        1,
+        1,
+        function()
+            ArmoryUtils:UpdateFonts()
+        end
+    )
+
+    ArmoryUtils:AppendSlider(
+        "SIDEFONTSIZE",
+        11,
+        6,
+        14,
+        1,
+        1,
+        function()
+            ArmoryUtils:UpdateFonts()
+        end
+    )
+end
+
 function ArmoryUtils:InitItemLevel()
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) and PaperDollFrame then
         for i, slot in pairs(AUCharSlots) do
@@ -685,4 +788,6 @@ function ArmoryUtils:InitItemLevel()
             end
         )
     end
+
+    ArmoryUtils:UpdateFonts()
 end
