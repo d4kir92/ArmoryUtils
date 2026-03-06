@@ -234,7 +234,14 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                 local Link = GetInventoryItemLink(unit, slotId) or GetInventoryItemID(unit, slotId)
                 if Link ~= nil then
                     local _, _, rarity = ArmoryUtils:GetItemInfo(Link)
-                    local ilvl, _, _ = ArmoryUtils:GetDetailedItemLevelInfo(Link)
+                    local itemLoc = ItemLocation:CreateFromEquipmentSlot(slotId)
+                    local ilvl = nil
+                    if itemLoc and itemLoc:IsValid() then
+                        ilvl = C_Item.GetCurrentItemLevel(itemLoc)
+                    else
+                        ilvl, _, _ = ArmoryUtils:GetDetailedItemLevelInfo(Link)
+                    end
+
                     local color = ITEM_QUALITY_COLORS[rarity]
                     if C_TooltipInfo then
                         local tooltipData = C_TooltipInfo.GetInventoryItem(unit, slotId)
