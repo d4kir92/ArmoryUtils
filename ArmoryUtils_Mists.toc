@@ -1,11 +1,20 @@
 ## Interface: 50503
-## Version: 1.1.27
-## Title: A|cff3FC7EBrmory|rU|cff3FC7EBtils|r |T134952:16:16:0:0|t by |cff3FC7EBD4KiR |T132115:16:16:0:0|t 
+## Version: 1.1.28
+## Title: ArmoryUtils |T134952:16:16:0:0|t by |cff55d2ffD4KiR |T132115:16:16:0:0|t 
 ## Notes: shows item level, enchants, gems.
 ## Notes-deDE: Zeigt die Stufe des Gegenstands, Verzauberungen und Edelsteine an.
-## Author: D|cff3FC7EB4KiR |T132115:16:16:0:0|t
-## Category: D|cff3FC7EB4KiR |T132115:16:16:0:0|t
-## X-Category: D|cff3FC7EB4KiR |T132115:16:16:0:0|t
+## Author: D4KiR |T132115:16:16:0:0|t
+## Category: User Interface
+## Category-deDE: Benutzerinterface
+## Category-esES: Interfaz de usuario
+## Category-esMX: Interfaz de usuario
+## Category-frFR: Interface utilisateur
+## Category-itIT: Interfaccia utente
+## Category-koKR: 사용자 인터페이스
+## Category-ptBR: Interface do usuário
+## Category-ruRU: Интерфейс пользователя
+## Category-zhCN: 用户界面
+## Category-zhTW: 使用者介面
 ## DefaultState: enabled
 ## SavedVariables: AUTAB
 ## SavedVariablesPerCharacter: AUTABPC

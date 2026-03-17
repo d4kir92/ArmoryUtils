@@ -6,7 +6,7 @@ ArmoryUtils:OnEvent(
 	function()
 		ArmoryUtils:UnregisterEvent(auf, "PLAYER_LOGIN")
 		ArmoryUtils:SetAddonOutput("ArmoryUtils", 134952)
-		ArmoryUtils:SetVersion(134952, "1.1.27")
+		ArmoryUtils:SetVersion(134952, "1.1.28")
 		if AUTAB == nil then
 			AUTAB = AUTAB or {}
 		end
@@ -22,7 +22,7 @@ ArmoryUtils:OnEvent(
 				["icon"] = 134952,
 				["var"] = mmbtn,
 				["dbtab"] = AUTAB,
-				["vTT"] = {{"|T134952:16:16:0:0|t A|cff3FC7EBrmory|rU|cff3FC7EBtils|r v|cff3FC7EB" .. ArmoryUtils:GetVersion()}, {ArmoryUtils:Trans("LID_LEFTCLICK"), ArmoryUtils:Trans("LID_OPENSETTINGS")}, {ArmoryUtils:Trans("LID_RIGHTCLICK"), ArmoryUtils:Trans("LID_HIDEMINIMAPBUTTON")}},
+				["vTT"] = {{"|T134952:16:16:0:0|t ArmoryUtils v" .. ArmoryUtils:GetVersion()}, {ArmoryUtils:Trans("LID_LEFTCLICK"), ArmoryUtils:Trans("LID_OPENSETTINGS")}, {ArmoryUtils:Trans("LID_RIGHTCLICK"), ArmoryUtils:Trans("LID_HIDEMINIMAPBUTTON")}},
 				["funcL"] = function()
 					ArmoryUtils:ToggleSettings()
 				end,

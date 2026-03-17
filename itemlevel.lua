@@ -602,7 +602,7 @@ function ArmoryUtils:InitSettings()
             ["pTab"] = {"CENTER"},
             ["sw"] = 520,
             ["sh"] = 520,
-            ["title"] = format("|T134952:16:16:0:0|t A|cff3FC7EBrmory|rU|cff3FC7EBtils|r v|cff3FC7EB%s", ArmoryUtils:GetVersion())
+            ["title"] = format("|T134952:16:16:0:0|t Armory|rUtils|r v%s", ArmoryUtils:GetVersion())
         }
     )
 
