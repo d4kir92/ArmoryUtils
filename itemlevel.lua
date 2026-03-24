@@ -234,10 +234,12 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                 local Link = GetInventoryItemLink(unit, slotId) or GetInventoryItemID(unit, slotId)
                 if Link ~= nil then
                     local _, _, rarity = ArmoryUtils:GetItemInfo(Link)
-                    local itemLoc = ItemLocation:CreateFromEquipmentSlot(slotId)
                     local ilvl = nil
-                    if itemLoc and itemLoc:IsValid() then
-                        ilvl = C_Item.GetCurrentItemLevel(itemLoc)
+                    if unit == "player" then
+                        local itemLoc = ItemLocation:CreateFromEquipmentSlot(slotId)
+                        if itemLoc and itemLoc:IsValid() then
+                            ilvl = C_Item.GetCurrentItemLevel(itemLoc)
+                        end
                     else
                         ilvl, _, _ = ArmoryUtils:GetDetailedItemLevelInfo(Link)
                     end
@@ -365,17 +367,19 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             end
         end
 
-        local wristSlot = getglobal(prefix .. "WristSlot")
-        if wristSlot == nil then return end
         if frame.ilvlbtn == nil and ArmoryUtils:GetName(frame) then
             frame.ilvlbtn = ArmoryUtils:CreateCheckButton(ArmoryUtils:GetName(frame) .. ".ilvlbtn", frame)
             frame.ilvlbtn:SetSize(20, 20)
-            if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                frame.ilvlbtn:SetPoint("LEFT", wristSlot, "BOTTOMLEFT", -2, -24)
-            else
-                frame.ilvlbtn:SetPoint("LEFT", wristSlot, "BOTTOMLEFT", -2, -26)
+            local px = 26
+            local py = 20
+            if _G[prefix .. "FramePortrait"] then
+                local sw, _ = _G[prefix .. "FramePortrait"]:GetSize()
+                local _, _, _, p4, p5 = _G[prefix .. "FramePortrait"]:GetPoint()
+                px = sw / 2 + p4
+                py = p5 + 14
             end
 
+            frame.ilvlbtn:SetPoint("CENTER", frame, "TOPLEFT", px, py + 14)
             frame.ilvlbtn:SetScript(
                 "OnClick",
                 function(sel)
@@ -387,15 +391,13 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     end
                 end
             )
-        end
 
-        if frame.ilvl == nil then
-            frame.ilvl = PaperDollFrame:CreateFontString(nil, "ARTWORK")
+            frame.ilvl = frame:CreateFontString(nil, "OVERLAY")
             frame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
             if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                frame.ilvl:SetPoint("LEFT", wristSlot, "BOTTOMLEFT", 18, -24)
+                frame.ilvl:SetPoint("CENTER", frame, "TOPLEFT", px, py)
             else
-                frame.ilvl:SetPoint("LEFT", wristSlot, "BOTTOMLEFT", 18, -26)
+                frame.ilvl:SetPoint("CENTER", frame, "TOPLEFT", px, py)
             end
 
             frame.ilvl:SetText(ITEM_LEVEL_ABBR .. ": ?")
