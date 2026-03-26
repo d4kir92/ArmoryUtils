@@ -223,6 +223,10 @@ function ArmoryUtils:PDUpdateDurability()
 end
 
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
+    if unit == "target" and InspectFrame and InspectFrame.unit then
+        unit = InspectFrame.unit
+    end
+
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) then
         local count = 0
         local sum = 0
@@ -564,14 +568,18 @@ function ArmoryUtils:WaitForInspectFrame()
         ArmoryUtils:AddIlvl("Inspect", _G["Inspect" .. slot], i)
     end
 
+    local inspect = false
     ArmoryUtils:RegisterEvent(IFThink, "INSPECT_READY")
     ArmoryUtils:OnEvent(
         IFThink,
-        function(sel, event, slotid, ...)
+        function(sel, event, guid, ...)
+            if inspect then return end
+            inspect = true
             ArmoryUtils:After(
                 0.31,
                 function()
                     ArmoryUtils:IFUpdateItemInfos()
+                    inspect = false
                 end, "ArmoryUtils.IFUpdateItemInfos 2"
             )
         end, "IFThink"
