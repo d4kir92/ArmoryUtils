@@ -803,3 +803,39 @@ function ArmoryUtils:InitItemLevel()
 
     ArmoryUtils:UpdateFonts()
 end
+
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("INSPECT_READY")
+frame:SetScript(
+    "OnEvent",
+    function(self, event, guid)
+        if event == "INSPECT_READY" then
+            if ArmoryUtils:IsAddonLoaded("TooltipUtils") then
+                frame:UnregisterEvent("INSPECT_READY")
+
+                return
+            end
+
+            local _, unit = GameTooltip:GetUnit()
+            if unit and UnitGUID(unit) == guid then
+                local ilevel = C_PaperDollInfo.GetInspectItemLevel(unit)
+                if ilevel and ilevel > 0 then
+                    GameTooltip:AddDoubleLine("ilvl:", format("%.1f", ilevel), 1, 0.8, 0)
+                    GameTooltip:Show() -- Tooltip refreshen, um Zeile anzuzeigen
+                end
+            end
+        end
+    end
+)
+
+TooltipDataProcessor.AddTooltipPostCall(
+    Enum.TooltipDataType.Unit,
+    function(tooltip, data)
+        if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
+        if InspectFrame and InspectFrame:IsShown() then return end
+        local _, unit = tooltip:GetUnit()
+        if unit and UnitIsPlayer(unit) and CanInspect(unit) then
+            NotifyInspect(unit)
+        end
+    end
+)

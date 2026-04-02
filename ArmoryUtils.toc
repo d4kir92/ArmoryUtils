@@ -41,4 +41,5 @@ locale\ruRU.lua
 locale\zhCN.lua
 
 itemlevel.lua
+settings.lua
 core.lua
