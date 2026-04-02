@@ -223,6 +223,30 @@ function ArmoryUtils:PDUpdateDurability()
     end
 end
 
+local function IsSlotEnchanted(unit, slotId)
+    local itemLink = GetInventoryItemLink(unit, slotId)
+    if not itemLink then return false, "Kein Item" end
+    -- Wir extrahieren die enchantID aus dem Link
+    local _, _, enchantID = string.find(itemLink, "item:%d+:(%d+)")
+    enchantID = tonumber(enchantID)
+    if enchantID and enchantID > 0 then
+        return true, enchantID
+    else
+        return false, 0
+    end
+end
+
+local enchantSlots = {}
+enchantSlots["RETAIL"] = {}
+enchantSlots["RETAIL"][1] = true
+enchantSlots["RETAIL"][3] = true
+enchantSlots["RETAIL"][5] = true
+enchantSlots["RETAIL"][7] = true
+enchantSlots["RETAIL"][8] = true
+enchantSlots["RETAIL"][11] = true
+enchantSlots["RETAIL"][12] = true
+enchantSlots["RETAIL"][16] = true
+enchantSlots["RETAIL"][17] = true
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
     if unit == "target" and InspectFrame and InspectFrame.unit then
         unit = InspectFrame.unit
@@ -312,7 +336,15 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                         end
 
                         if not foundEnchant then
-                            SLOT.autexte:SetText("")
+                            if enchantSlots[ArmoryUtils:GetWoWBuild()] then
+                                if enchantSlots[ArmoryUtils:GetWoWBuild()][SLOT:GetID()] then
+                                    SLOT.autexte:SetText("|T130775:0:0:0:0|t")
+                                else
+                                    SLOT.autexte:SetText("")
+                                end
+                            else
+                                SLOT.autexte:SetText("")
+                            end
                         end
                     else
                         SLOT.autexte:SetText("")
