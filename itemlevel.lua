@@ -575,13 +575,8 @@ function ArmoryUtils:WaitForInspectFrame()
         function(sel, event, guid, ...)
             if inspect then return end
             inspect = true
-            ArmoryUtils:After(
-                0.31,
-                function()
-                    ArmoryUtils:IFUpdateItemInfos()
-                    inspect = false
-                end, "ArmoryUtils.IFUpdateItemInfos 2"
-            )
+            ArmoryUtils:IFUpdateItemInfos()
+            inspect = false
         end, "IFThink"
     )
 
