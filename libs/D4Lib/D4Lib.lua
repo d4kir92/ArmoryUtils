@@ -1408,6 +1408,26 @@ D4:After(
 local inspectCache = {}
 local itemLevelCache = {}
 local CACHE_DURATION = 3600
+function D4:GetInspectILvl(unit)
+    local totalLevel = 0
+    local itemCount = 0
+    local slots = {1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18}
+    for _, slotId in ipairs(slots) do
+        local itemLink = GetInventoryItemLink(unit, slotId)
+        if itemLink then
+            local _, _, _, itemLevel = GetItemInfo(itemLink)
+            if itemLevel and itemLevel > 0 then
+                totalLevel = totalLevel + itemLevel
+                itemCount = itemCount + 1
+            end
+        end
+    end
+
+    if itemCount == 0 then return 0 end
+
+    return totalLevel / itemCount
+end
+
 function D4:GetInspectCache(guid)
     local data = inspectCache[guid]
     if data then
