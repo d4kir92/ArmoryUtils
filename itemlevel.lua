@@ -853,7 +853,7 @@ frame:SetScript(
             if cachedLevel then return end
             local _, unit = GameTooltip:GetUnit()
             if InCombatLockdown() then return end
-            if issecurevariable("UnitExists", unit) then return end
+            if not pcall(UnitExists, unit) then return end
             if unit and UnitExists(unit) and UnitGUID(unit) == guid then
                 if C_PaperDollInfo and C_PaperDollInfo.GetInspectItemLevel then
                     local ilevel = C_PaperDollInfo.GetInspectItemLevel(unit)
@@ -877,13 +877,13 @@ frame:SetScript(
 
 TooltipDataProcessor.AddTooltipPostCall(
     Enum.TooltipDataType.Unit,
-    function(tooltip, data)
+    function(tt, data)
         if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
         if not AUTAB["SHOWITEMLEVEL"] then return end
         if InspectFrame and InspectFrame:IsShown() then return end
-        local _, unit = tooltip:GetUnit()
+        local _, unit = tt:GetUnit()
         if InCombatLockdown() then return end
-        if issecurevariable("UnitExists", unit) then return end
+        if not pcall(UnitExists, unit) then return end
         if unit and UnitExists(unit) and UnitIsPlayer(unit) and CanInspect(unit) then
             local guid = UnitGUID(unit)
             local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
@@ -892,8 +892,8 @@ TooltipDataProcessor.AddTooltipPostCall(
                 ArmoryUtils:SaveToInspectCache(guid)
                 NotifyInspect(unit)
             elseif cachedLevel then
-                GameTooltip:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
-                GameTooltip:Show()
+                tt:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
+                tt:Show()
             end
         end
     end
@@ -902,10 +902,12 @@ TooltipDataProcessor.AddTooltipPostCall(
 if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetUnit") then
     GameTooltip:HookScript(
         "OnTooltipSetUnit",
-        function(tt, ...)
+        function(tt, data)
             if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
             if not AUTAB["SHOWITEMLEVEL"] then return end
-            local _, unit = self:GetUnit()
+            local _, unit = tt:GetUnit()
+            if InCombatLockdown() then return end
+            if not pcall(UnitExists, unit) then return end
             if unit and UnitIsPlayer(unit) and CanInspect(unit) then
                 local guid = UnitGUID(unit)
                 local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
@@ -914,7 +916,7 @@ if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetUnit") then
                     ArmoryUtils:SaveToInspectCache(guid)
                     NotifyInspect(unit)
                 elseif cachedLevel then
-                    GameTooltip:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
+                    tt:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
                 end
             end
         end
