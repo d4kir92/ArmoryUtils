@@ -17,6 +17,7 @@ for i, x in pairs({"HandsSlot", "WaistSlot", "LegsSlot", "FeetSlot", "Finger0Slo
     AUCharSlotsRight["Inspect" .. x] = true
 end
 
+local lastInspectGUID = nil
 local fontSizeGems = 12
 local fontSizeEnchants = 8
 local PDThink = CreateFrame("FRAME")
@@ -248,7 +249,7 @@ enchantSlots["RETAIL"][12] = true
 enchantSlots["RETAIL"][16] = true
 enchantSlots["RETAIL"][17] = true
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
-    if unit == "target" and InspectFrame and InspectFrame.unit then
+    if unit == "target" and InspectFrame and InspectFrame.unit and CanInspect(InspectFrame.unit) then
         unit = InspectFrame.unit
     end
 
@@ -458,6 +459,8 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             AUILVL = string.format("%0.2f", sum / max)
             if frame.ilvl then
                 frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
+                ClearInspectPlayer()
+                lastInspectGUID = nil
             end
         elseif frame.ilvl then
             frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
@@ -608,7 +611,12 @@ function ArmoryUtils:WaitForInspectFrame()
         function(sel, event, guid, ...)
             if inspect then return end
             inspect = true
-            ArmoryUtils:IFUpdateItemInfos()
+            pcall(
+                function()
+                    ArmoryUtils:IFUpdateItemInfos()
+                end
+            )
+
             inspect = false
         end, "IFThink"
     )
@@ -842,7 +850,7 @@ frame:RegisterEvent("INSPECT_READY")
 frame:SetScript(
     "OnEvent",
     function(self, event, guid)
-        if event == "INSPECT_READY" then
+        if event == "INSPECT_READY" and guid == lastInspectGUID then
             if ArmoryUtils:IsAddonLoaded("TooltipUtils") then
                 frame:UnregisterEvent("INSPECT_READY")
 
@@ -890,6 +898,7 @@ TooltipDataProcessor.AddTooltipPostCall(
             if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
                 lastInspect = GetTime() + 2
                 ArmoryUtils:SaveToInspectCache(guid)
+                lastInspectGUID = guid
                 NotifyInspect(unit)
             elseif cachedLevel then
                 tt:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
@@ -914,6 +923,7 @@ if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetUnit") then
                 if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
                     lastInspect = GetTime() + 2
                     ArmoryUtils:SaveToInspectCache(guid)
+                    lastInspectGUID = guid
                     NotifyInspect(unit)
                 elseif cachedLevel then
                     tt:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
