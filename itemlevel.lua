@@ -850,7 +850,7 @@ frame:RegisterEvent("INSPECT_READY")
 frame:SetScript(
     "OnEvent",
     function(self, event, guid)
-        if event == "INSPECT_READY" and guid == lastInspectGUID then
+        if event == "INSPECT_READY" and lastInspectGUID and guid == lastInspectGUID then
             if ArmoryUtils:IsAddonLoaded("TooltipUtils") then
                 frame:UnregisterEvent("INSPECT_READY")
 
