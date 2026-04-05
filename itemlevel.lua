@@ -251,6 +251,7 @@ enchantSlots["RETAIL"][17] = true
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
     if unit == "target" and InspectFrame and InspectFrame.unit and CanInspect(InspectFrame.unit) then
         unit = InspectFrame.unit
+        ClearInspectPlayer = function() end --.. fix inspect
     end
 
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) then
@@ -459,8 +460,9 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             AUILVL = string.format("%0.2f", sum / max)
             if frame.ilvl then
                 frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
-                ClearInspectPlayer()
-                lastInspectGUID = nil
+                if unit ~= "player" then
+                    lastInspectGUID = nil
+                end
             end
         elseif frame.ilvl then
             frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
@@ -619,13 +621,6 @@ function ArmoryUtils:WaitForInspectFrame()
 
             inspect = false
         end, "IFThink"
-    )
-
-    ArmoryUtils:After(
-        0.32,
-        function()
-            ArmoryUtils:IFUpdateItemInfos()
-        end, "ArmoryUtils.IFUpdateItemInfos 1"
     )
 end
 
