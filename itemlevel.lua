@@ -248,6 +248,14 @@ enchantSlots["RETAIL"][11] = true
 enchantSlots["RETAIL"][12] = true
 enchantSlots["RETAIL"][16] = true
 enchantSlots["RETAIL"][17] = true
+function ArmoryUtils:IsOffhandAWeapon(unit, slotId)
+    local itemID = GetInventoryItemID(unit, slotId)
+    if not itemID then return false end
+    local _, _, _, _, _, _, _, _, invType = C_Item.GetItemInfo(itemID)
+
+    return invType and invType == "INVTYPE_WEAPON"
+end
+
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
     if unit == "target" and InspectFrame and InspectFrame.unit and CanInspect(InspectFrame.unit) then
         unit = InspectFrame.unit
@@ -339,7 +347,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
 
                         if not foundEnchant then
                             if enchantSlots[ArmoryUtils:GetWoWBuild()] then
-                                if enchantSlots[ArmoryUtils:GetWoWBuild()][SLOT:GetID()] then
+                                if SLOT:GetID() and (SLOT:GetID() ~= 17 or ArmoryUtils:IsOffhandAWeapon(unit, 17)) and enchantSlots[ArmoryUtils:GetWoWBuild()][SLOT:GetID()] then
                                     SLOT.autexte:SetText("|T130775:0:0:0:0|t")
                                 else
                                     SLOT.autexte:SetText("")
