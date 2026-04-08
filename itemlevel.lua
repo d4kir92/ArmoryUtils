@@ -479,15 +479,18 @@ for i = 1, 20 do
     tinsert(tab, "ContainerFrame" .. i)
 end
 
+local bagSetups = {}
 function ArmoryUtils:UpdateBagsIlvl(event)
-    if ContainerFrameCombinedBags and ContainerFrameCombinedBags.ausetup == nil then
-        ContainerFrameCombinedBags.ausetup = true
-        ContainerFrameCombinedBags:HookScript(
-            "OnShow",
-            function(sel)
-                ArmoryUtils:UpdateBag(ContainerFrameCombinedBags)
-            end
-        )
+    if ContainerFrameCombinedBags then
+        if bagSetups[ContainerFrameCombinedBags] == nil then
+            bagSetups[ContainerFrameCombinedBags] = true
+            ContainerFrameCombinedBags:HookScript(
+                "OnShow",
+                function(sel)
+                    ArmoryUtils:UpdateBag(ContainerFrameCombinedBags)
+                end
+            )
+        end
 
         ArmoryUtils:UpdateBag(ContainerFrameCombinedBags)
     end
@@ -495,8 +498,8 @@ function ArmoryUtils:UpdateBagsIlvl(event)
     for x, bagName in pairs(tab) do
         local bag = _G[bagName]
         if bag then
-            if bag.ausetup == nil then
-                bag.ausetup = true
+            if bagSetups[bag] == nil then
+                bagSetups[bag] = true
                 bag:HookScript(
                     "OnShow",
                     function(sel)
@@ -758,7 +761,7 @@ function ArmoryUtils:InitItemLevel()
         ArmoryUtils:RegisterEvent(frame, "BAG_SLOT_FLAGS_UPDATED")
         ArmoryUtils:OnEvent(
             frame,
-            function(sel, event)
+            function(sel, event, ...)
                 ArmoryUtils:UpdateBagsIlvl(event)
             end, "UpdateBagsIlvl"
         )
