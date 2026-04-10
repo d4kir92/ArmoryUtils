@@ -256,10 +256,21 @@ function ArmoryUtils:IsOffhandAWeapon(unit, slotId)
     return invType and invType == "INVTYPE_WEAPON"
 end
 
+local fixedInspect = false
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
-    if unit == "target" and InspectFrame and InspectFrame.unit and CanInspect(InspectFrame.unit) then
-        unit = InspectFrame.unit
-        ClearInspectPlayer = function() end --.. fix inspect
+    if unit == nil then return end
+    if prefix == "Inspect" then
+        if not CanInspect(InspectFrame.unit) then return end
+        if not fixedInspect then
+            fixedInspect = true
+            -- Some Addons Clear Inspect when the InspectFrame is open! it will make it blank
+            ClearInspectPlayer = function() end
+            local originalNotifyInspect = NotifyInspect
+            NotifyInspect = function(inspectUnit)
+                if InspectFrame and InspectFrame:IsShown() then return end -- only allow when its closed
+                originalNotifyInspect(inspectUnit)
+            end
+        end
     end
 
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) then
@@ -399,11 +410,6 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                             SLOT.autextg:SetText("")
                             SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                         end
-                    else
-                        SLOT.autext:SetText("")
-                        SLOT.autexte:SetText("")
-                        SLOT.autextg:SetText("")
-                        SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                     end
                 else
                     SLOT.autext:SetText("")
@@ -597,7 +603,9 @@ function ArmoryUtils:CheckInspectSlot(slot)
 end
 
 function ArmoryUtils:IFUpdateItemInfos()
-    ArmoryUtils:UpdateChar(InspectPaperDollFrame, "target", "Inspect", ArmoryUtils.IFUpdateItemInfos)
+    if InspectFrame and InspectFrame.unit then
+        ArmoryUtils:UpdateChar(InspectPaperDollFrame, InspectFrame.unit, "Inspect", ArmoryUtils.IFUpdateItemInfos)
+    end
 end
 
 function ArmoryUtils:WaitForInspectFrame()
