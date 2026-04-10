@@ -421,42 +421,19 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
         end
 
         if frame.ilvlbtn == nil and ArmoryUtils:GetName(frame) then
-            frame.ilvlbtn = ArmoryUtils:CreateCheckButton(ArmoryUtils:GetName(frame) .. ".ilvlbtn", frame)
-            frame.ilvlbtn:SetSize(20, 20)
-            local px = 26
-            local py = 20
-            if _G[prefix .. "FramePortrait"] then
-                local sw, _ = _G[prefix .. "FramePortrait"]:GetSize()
-                local _, _, _, p4, p5 = _G[prefix .. "FramePortrait"]:GetPoint()
-                px = sw / 2 + p4
-                py = p5 + 14
-            end
-
-            frame.ilvlbtn:SetPoint("CENTER", frame, "TOPLEFT", px, py + 14)
-            frame.ilvlbtn:SetScript(
-                "OnClick",
-                function(sel)
-                    local newval = sel:GetChecked()
-                    ArmoryUtils:DBSV("ITEMLEVEL" .. unit, newval)
-                    func()
-                    if ArmoryUtils.UpdateBagsIlvl then
-                        ArmoryUtils:UpdateBagsIlvl("INIT")
-                    end
-                end
-            )
-
             frame.ilvl = frame:CreateFontString(nil, "OVERLAY")
             frame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
-            if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                frame.ilvl:SetPoint("CENTER", frame, "TOPLEFT", px, py)
-            else
-                frame.ilvl:SetPoint("CENTER", frame, "TOPLEFT", px, py)
+            if _G[prefix .. "NameFrame"] then
+                local nameFrame = _G[prefix .. "NameFrame"]
+                frame.ilvl:SetPoint("BOTTOM", nameFrame, "TOP", 0, 8)
+            elseif _G[prefix .. "Frame"] and _G[prefix .. "Frame"].TitleContainer then
+                local titleContainer = _G[prefix .. "Frame"].TitleContainer
+                frame.ilvl:SetPoint("BOTTOM", titleContainer, "TOP", 0, 0)
             end
 
-            frame.ilvl:SetText(ITEM_LEVEL_ABBR .. ": ?")
+            frame.ilvl:SetText("")
         end
 
-        frame.ilvlbtn:SetChecked(ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true))
         if count > 0 then
             local max = 16 -- when only AUnhand
             if GetInventoryItemID(unit, 17) then
@@ -473,13 +450,22 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
 
             AUILVL = string.format("%0.2f", sum / max)
             if frame.ilvl then
-                frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
+                if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value then
+                    CharacterStatsPane.ItemLevelFrame.Value:SetText(ArmoryUtils:GetAUILVL())
+                else
+                    frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
+                end
+
                 if unit ~= "player" then
                     lastInspectGUID = nil
                 end
             end
         elseif frame.ilvl then
-            frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
+            if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value then
+                CharacterStatsPane.ItemLevelFrame.Value:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
+            else
+                frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
+            end
         end
     end
 end
@@ -605,6 +591,13 @@ end
 function ArmoryUtils:IFUpdateItemInfos()
     if InspectFrame and InspectFrame.unit then
         ArmoryUtils:UpdateChar(InspectPaperDollFrame, InspectFrame.unit, "Inspect", ArmoryUtils.IFUpdateItemInfos)
+    else
+        C_Timer.After(
+            0.1,
+            function()
+                ArmoryUtils:IFUpdateItemInfos()
+            end
+        )
     end
 end
 
@@ -897,30 +890,32 @@ frame:SetScript(
     end
 )
 
-TooltipDataProcessor.AddTooltipPostCall(
-    Enum.TooltipDataType.Unit,
-    function(tt, data)
-        if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
-        if not AUTAB["SHOWITEMLEVEL"] then return end
-        if InspectFrame and InspectFrame:IsShown() then return end
-        local _, unit = tt:GetUnit()
-        if InCombatLockdown() then return end
-        if not pcall(UnitExists, unit) then return end
-        if unit and UnitExists(unit) and UnitIsPlayer(unit) and CanInspect(unit) then
-            local guid = UnitGUID(unit)
-            local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
-            if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
-                lastInspect = GetTime() + 2
-                ArmoryUtils:SaveToInspectCache(guid)
-                lastInspectGUID = guid
-                NotifyInspect(unit)
-            elseif cachedLevel then
-                tt:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
-                tt:Show()
+if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
+    TooltipDataProcessor.AddTooltipPostCall(
+        Enum.TooltipDataType.Unit,
+        function(tt, data)
+            if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
+            if not AUTAB["SHOWITEMLEVEL"] then return end
+            if InspectFrame and InspectFrame:IsShown() then return end
+            local _, unit = tt:GetUnit()
+            if InCombatLockdown() then return end
+            if not pcall(UnitExists, unit) then return end
+            if unit and UnitExists(unit) and UnitIsPlayer(unit) and CanInspect(unit) then
+                local guid = UnitGUID(unit)
+                local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
+                if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
+                    lastInspect = GetTime() + 2
+                    ArmoryUtils:SaveToInspectCache(guid)
+                    lastInspectGUID = guid
+                    NotifyInspect(unit)
+                elseif cachedLevel then
+                    tt:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
+                    tt:Show()
+                end
             end
         end
-    end
-)
+    )
+end
 
 if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetUnit") then
     GameTooltip:HookScript(
