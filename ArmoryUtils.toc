@@ -5,7 +5,7 @@
 ## Interface-Mists: 50503
 ## Interface: 120001
 
-## Version: 1.1.49
+## Version: 1.1.50
 ## Title: ArmoryUtils by |cff55d2ffD4KiR |T132115:16:16:0:0|t 
 ## Notes: shows item level, enchants, gems.
 ## Notes-deDE: Zeigt die Stufe des Gegenstands, Verzauberungen und Edelsteine an.
