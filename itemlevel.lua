@@ -434,7 +434,6 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             frame.ilvl:SetText("")
         end
 
-        local overallIlvl = ArmoryUtils:GetAUILVL()
         if count > 0 then
             local max = 16 -- when only AUnhand
             if GetInventoryItemID(unit, 17) then
@@ -451,11 +450,11 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
 
             AUILVL = string.format("%0.2f", sum / max)
             if frame.ilvl then
-                if overallIlvl then
+                if ArmoryUtils:GetAUILVL() then
                     if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value then
-                        CharacterStatsPane.ItemLevelFrame.Value:SetText(overallIlvl)
+                        CharacterStatsPane.ItemLevelFrame.Value:SetText(ArmoryUtils:GetAUILVL())
                     else
-                        frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. overallIlvl)
+                        frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
                     end
                 end
 
@@ -464,8 +463,8 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                 end
             end
         elseif frame.ilvl then
-            if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value and overallIlvl then
-                CharacterStatsPane.ItemLevelFrame.Value:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. overallIlvl)
+            if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value and ArmoryUtils:GetAUILVL() then
+                CharacterStatsPane.ItemLevelFrame.Value:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
             else
                 frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
             end
