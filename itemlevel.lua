@@ -257,6 +257,7 @@ function ArmoryUtils:IsOffhandAWeapon(unit, slotId)
 end
 
 local fixedInspect = false
+local characterIlvlHooked = false
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
     if unit == nil then return end
     if prefix == "Inspect" then
@@ -283,7 +284,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                 local slotId = SLOT:GetID()
                 local Link = GetInventoryItemLink(unit, slotId) or GetInventoryItemID(unit, slotId)
                 if Link ~= nil then
-                    local _, _, rarity = ArmoryUtils:GetItemInfo(Link)
+                    local _, _, rarity, _, _, _, _, _, itemEquipLoc = ArmoryUtils:GetItemInfo(Link)
                     local ilvl = nil
                     if unit == "player" then
                         local itemLoc = ItemLocation:CreateFromEquipmentSlot(slotId)
@@ -389,6 +390,10 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                             sum = sum + ilvl
                         end
 
+                        if i == 16 and itemEquipLoc and itemEquipLoc == "INVTYPE_2HWEAPON" then
+                            sum = sum + ilvl
+                        end
+
                         if ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true) then
                             if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and ilvl and ilvl > 1 then
                                 SLOT.autext:SetText(color.hex .. ilvl)
@@ -435,23 +440,30 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
         end
 
         if count > 0 then
-            local max = 16 -- when only AUnhand
-            if GetInventoryItemID(unit, 17) then
-                local t1 = ArmoryUtils:GetItemInfo(GetInventoryItemLink(unit, 17))
-                -- when 2x 1handed
-                if t1 then
-                    max = 17
-                end
-            end
-
+            local max = 17
             if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                max = max - 1
+                max = 16
             end
 
             AUILVL = string.format("%0.2f", sum / max)
             if frame.ilvl then
                 if ArmoryUtils:GetAUILVL() then
                     if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value then
+                        if characterIlvlHooked == false then
+                            characterIlvlHooked = true
+                            local setText = false
+                            hooksecurefunc(
+                                CharacterStatsPane.ItemLevelFrame.Value,
+                                "SetText",
+                                function(sel)
+                                    if setText then return end
+                                    setText = true
+                                    sel:SetText(ArmoryUtils:GetAUILVL())
+                                    setText = false
+                                end
+                            )
+                        end
+
                         CharacterStatsPane.ItemLevelFrame.Value:SetText(ArmoryUtils:GetAUILVL())
                     else
                         frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
