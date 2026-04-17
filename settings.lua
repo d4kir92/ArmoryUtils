@@ -6,7 +6,7 @@ AUTABSetup:SetScript(
     function(self, event, ...)
         if event == "PLAYER_LOGIN" then
             AUTAB = AUTAB or {}
-            ArmoryUtils:SetVersion(134952, "1.1.52")
+            ArmoryUtils:SetVersion(134952, "1.1.53")
             ArmoryUtils:SetAddonOutput("ArmoryUtils", 134952)
             local mmbtn = nil
             ArmoryUtils:CreateMinimapButton(
