@@ -256,7 +256,7 @@ function ArmoryUtils:IsOffhandAWeapon(unit, slotId)
     return invType and invType == "INVTYPE_WEAPON"
 end
 
-local fixedInspect = false
+local fixedInspect = true
 local characterIlvlHooked = false
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
     if unit == nil then return end
