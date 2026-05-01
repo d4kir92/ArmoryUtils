@@ -890,14 +890,14 @@ frame:SetScript(
                             local ilevel = C_PaperDollInfo.GetInspectItemLevel(unit)
                             if ilevel and ilevel > 0 then
                                 ArmoryUtils:SaveToItemLevelCache(guid, ilevel)
-                                GameTooltip:AddDoubleLine("ilvl:", format("%.1f", ilevel))
+                                GameTooltip:AddDoubleLine("ilvl:", format("%d", ilevel))
                                 GameTooltip:Show()
                             end
                         else
                             local ilevel = ArmoryUtils:GetInspectILvl(unit)
                             if ilevel and ilevel > 0 then
                                 ArmoryUtils:SaveToItemLevelCache(guid, ilevel)
-                                GameTooltip:AddDoubleLine("ilvl:", format("%.1f", ilevel))
+                                GameTooltip:AddDoubleLine("ilvl:", format("%d", ilevel))
                                 GameTooltip:Show()
                             end
                         end
@@ -929,7 +929,7 @@ if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
                             lastInspectGUID = guid
                             NotifyInspect(unit)
                         elseif cachedLevel then
-                            tt:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
+                            tt:AddDoubleLine("ilvl:", format("%d", cachedLevel))
                             tt:Show()
                         end
                     end
@@ -959,7 +959,7 @@ if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetUnit") then
                             lastInspectGUID = guid
                             NotifyInspect(unit)
                         elseif cachedLevel then
-                            tt:AddDoubleLine("ilvl:", format("%.1f", cachedLevel))
+                            tt:AddDoubleLine("ilvl:", format("%d", cachedLevel))
                         end
                     end
                 end
