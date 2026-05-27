@@ -425,8 +425,8 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             end
         end
 
-        if frame.ilvlbtn == nil and ArmoryUtils:GetName(frame) then
-            frame.ilvl = frame:CreateFontString(nil, "OVERLAY")
+        if frame.ilvl == nil and ArmoryUtils:GetName(frame) then
+            frame.ilvl = frame:CreateFontString("ArmoryUtils.ilvl", "OVERLAY")
             frame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
             if _G[prefix .. "NameFrame"] then
                 local nameFrame = _G[prefix .. "NameFrame"]
