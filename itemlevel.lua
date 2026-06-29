@@ -1,8 +1,8 @@
 local _, ArmoryUtils = ...
 local ITEM_LEVEL_ABBR = ITEM_LEVEL_ABBR or "ilvl"
 local AUGlowAlpha = 0.75
-local AUClassIDs = {2, 3, 4, 6, 8}
-local AUSubClassIDs15 = {5, 6}
+local AUClassIDs = {[2]=true, [3]=true, [4]=true, [6]=true, [8]=true}
+local AUSubClassIDs15 = {[5]=true, [6]=true}
 local slotbry = 0
 local AUCharSlots = {"AmmoSlot", "HeadSlot", "NeckSlot", "ShoulderSlot", "ShirtSlot", "ChestSlot", "WaistSlot", "LegsSlot", "FeetSlot", "WristSlot", "HandsSlot", "Finger0Slot", "Finger1Slot", "Trinket0Slot", "Trinket1Slot", "BackSlot", "MainHandSlot", "SecondaryHandSlot", "RangedSlot", "TabardSlot",}
 local AUCharSlotsLeft = {}
@@ -95,79 +95,28 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
         ArmoryUtils:AddSideText(SLOT.autexte)
         ArmoryUtils:AddSideText(SLOT.autextg)
         local px = 8
-        if false and ArmoryUtils:DBGV("ITEMLEVELSYSTEMSIDEWAYS", true) then
-            slotbry = 2
-            if AUCharSlotsLeft[name] then
-                if i == 17 or i == 18 then
-                    SLOT.autexte:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
-                else
-                    SLOT.autexte:SetPoint("LEFT", SLOT.auinfo, "RIGHT", px, 0)
-                    SLOT.autextg:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
-                end
-            elseif AUCharSlotsRight[name] then
-                if i == 17 or i == 18 then
-                    SLOT.autexte:SetPoint("BOTTOMRIGHT", SLOT.auinfo, "BOTTOMLEFT", -px, slotbry)
-                else
-                    SLOT.autexte:SetPoint("RIGHT", SLOT.auinfo, "LEFT", -px, 0)
-                    SLOT.autextg:SetPoint("BOTTOMRIGHT", SLOT.auinfo, "BOTTOMLEFT", -px, slotbry)
-                end
+        slotbry = 3
+        if AUCharSlotsLeft[name] then
+            if i == 17 or i == 18 then
+                SLOT.autexte:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
             else
-                slotbry = 0
-                SLOT.autexte:SetPoint("CENTER", SLOT.auinfo, "CENTER", 0, 0)
-                SLOT.autextg:SetPoint("CENTER", SLOT.auinfo, "CENTER", 0, slotbry)
+                SLOT.autexte:SetPoint("TOPLEFT", SLOT.auinfo, "TOPRIGHT", px, -slotbry)
+                SLOT.autextg:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
+            end
+        elseif AUCharSlotsRight[name] then
+            if i == 17 or i == 18 then
+                SLOT.autexte:SetPoint("BOTTOMRIGHT", SLOT.auinfo, "BOTTOMLEFT", -px, slotbry)
+            else
+                SLOT.autexte:SetPoint("TOPRIGHT", SLOT.auinfo, "TOPLEFT", -px, -slotbry)
+                SLOT.autextg:SetPoint("BOTTOMRIGHT", SLOT.auinfo, "BOTTOMLEFT", -px, slotbry)
             end
         else
-            slotbry = 3
-            if AUCharSlotsLeft[name] then
-                if i == 17 or i == 18 then
-                    SLOT.autexte:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
-                else
-                    SLOT.autexte:SetPoint("TOPLEFT", SLOT.auinfo, "TOPRIGHT", px, -slotbry)
-                    SLOT.autextg:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
-                end
-            elseif AUCharSlotsRight[name] then
-                if i == 17 or i == 18 then
-                    SLOT.autexte:SetPoint("BOTTOMRIGHT", SLOT.auinfo, "BOTTOMLEFT", -px, slotbry)
-                else
-                    SLOT.autexte:SetPoint("TOPRIGHT", SLOT.auinfo, "TOPLEFT", -px, -slotbry)
-                    SLOT.autextg:SetPoint("BOTTOMRIGHT", SLOT.auinfo, "BOTTOMLEFT", -px, slotbry)
-                end
-            else
-                slotbry = 0
-                SLOT.autexte:SetPoint("CENTER", SLOT.auinfo, "CENTER", 0, 0)
-                SLOT.autextg:SetPoint("CENTER", SLOT.auinfo, "CENTER", 0, slotbry)
-            end
+            SLOT.autexte:SetPoint("CENTER", SLOT.auinfo, "CENTER", 0, 0)
+            SLOT.autextg:SetPoint("CENTER", SLOT.auinfo, "CENTER", 0, 0)
         end
 
-        if false and ArmoryUtils:DBGV("ITEMLEVELSYSTEMSIDEWAYS", true) then
-            slotbry = 2
-            if AUCharSlotsLeft[name] then
-                SLOT.autext:SetPoint("TOPLEFT", SLOT.auinfo, "TOPRIGHT", px, -slotbry)
-            elseif AUCharSlotsRight[name] then
-                SLOT.autext:SetPoint("TOPRIGHT", SLOT.auinfo, "TOPLEFT", -px, -slotbry)
-            else
-                slotbry = 0
-                SLOT.autext:SetPoint("TOP", SLOT.auinfo, "TOP", 0, -slotbry)
-            end
-        else
-            slotbry = 0
-            SLOT.autext:SetPoint("TOP", SLOT.auinfo, "TOP", 0, -slotbry)
-        end
-
-        if false and ArmoryUtils:DBGV("ITEMLEVELSYSTEMSIDEWAYS", true) then
-            slotbry = 2
-            if AUCharSlotsLeft[name] then
-                SLOT.autexth:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
-            elseif AUCharSlotsRight[name] then
-                SLOT.autexth:SetPoint("BOTTOMRIGHT", SLOT.auinfo, "BOTTOMLEFT", -px, slotbry)
-            else
-                slotbry = 0
-                SLOT.autexth:SetPoint("BOTTOM", SLOT.auinfo, "BOTTOM", 0, slotbry)
-            end
-        else
-            slotbry = 0
-            SLOT.autexth:SetPoint("BOTTOM", SLOT.auinfo, "BOTTOM", 0, slotbry)
-        end
+        SLOT.autext:SetPoint("TOP", SLOT.auinfo, "TOP", 0, 0)
+        SLOT.autexth:SetPoint("BOTTOM", SLOT.auinfo, "BOTTOM", 0, 0)
 
         local NormalTexture = SLOT.NormalTexture or _G[name .. "NormalTexture"]
         if NormalTexture then
@@ -341,13 +290,11 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                                         text = text .. "  "
                                     end
 
-                                    local item = ArmoryUtils:GetItemInfo(gem)
-                                    if item == nil then
+                                    local gemName, _, _, _, _, _, _, _, _, gemIcon, _, gemClassID = ArmoryUtils:GetItemInfo(gem)
+                                    if gemName == nil then
                                         text = text .. "|T" .. "Interface/ItemsocketingFrame/UI-EmptySocket-Prismatic" .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|t"
                                     else
-                                        local icon = select(10, ArmoryUtils:GetItemInfo(gem))
-                                        local classID = select(12, ArmoryUtils:GetItemInfo(gem))
-                                        text = text .. "|T" .. icon .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|t|A:" .. "Professions-ChatIcon-Quality-Tier" .. classID .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|a"
+                                        text = text .. "|T" .. gemIcon .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|t|A:" .. "Professions-ChatIcon-Quality-Tier" .. gemClassID .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|a"
                                     end
                                 end
 
@@ -494,6 +441,7 @@ for i = 1, 20 do
 end
 
 local bagSetups = {}
+local bagUpdatePending = false
 function ArmoryUtils:UpdateBagsIlvl(event)
     if ContainerFrameCombinedBags then
         if bagSetups[ContainerFrameCombinedBags] == nil then
@@ -538,7 +486,7 @@ function ArmoryUtils:UpdateBagItem(bagID, size, SLOT, i)
             local color = ITEM_QUALITY_COLORS[rarity]
             if ilvl and color then
                 if ArmoryUtils:DBGV("ITEMLEVEL", true) then
-                    if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and tContains(AUClassIDs, classID) or (classID == 15 and tContains(AUSubClassIDs15, subclassID)) and ilvl and ilvl > 1 then
+                    if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and (AUClassIDs[classID] or (classID == 15 and AUSubClassIDs15[subclassID])) and ilvl and ilvl > 1 then
                         SLOT.autext:SetText(color.hex .. ilvl)
                     else
                         SLOT.autext:SetText("")
@@ -785,7 +733,13 @@ function ArmoryUtils:InitItemLevel()
         ArmoryUtils:OnEvent(
             frame,
             function(sel, event, ...)
-                ArmoryUtils:UpdateBagsIlvl(event)
+                if not bagUpdatePending then
+                    bagUpdatePending = true
+                    C_Timer.After(0.1, function()
+                        bagUpdatePending = false
+                        ArmoryUtils:UpdateBagsIlvl(event)
+                    end)
+                end
             end, "UpdateBagsIlvl"
         )
 
@@ -801,23 +755,18 @@ function ArmoryUtils:InitItemLevel()
                     local search = CreateFrame("EditBox", "BagItemSearchBox" .. i, cf, "BagSearchBoxTemplate")
                     search:SetSize(110, 18)
                     search:SetPoint("TOPLEFT", cf, "TOPLEFT", 50, -30)
-                    search:SetScript(
-                        "OnUpdate",
-                        function(sel, ...)
-                            if ArmoryUtils:DBGV("IMPROVEBAGS", true) then
-                                if IsBagOpen(0) and cf:GetID() == 0 then
-                                    sel:SetAlpha(1)
-                                    sel:EnableMouse(true)
-                                else
-                                    sel:SetAlpha(0)
-                                    sel:EnableMouse(false)
-                                end
-                            else
-                                sel:SetAlpha(0)
-                                sel:EnableMouse(false)
-                            end
+                    local function updateSearchVisibility()
+                        if ArmoryUtils:DBGV("IMPROVEBAGS", true) and IsBagOpen(0) and cf:GetID() == 0 then
+                            search:SetAlpha(1)
+                            search:EnableMouse(true)
+                        else
+                            search:SetAlpha(0)
+                            search:EnableMouse(false)
                         end
-                    )
+                    end
+                    cf:HookScript("OnShow", updateSearchVisibility)
+                    cf:HookScript("OnHide", updateSearchVisibility)
+                    updateSearchVisibility()
                 end
             end
         end
