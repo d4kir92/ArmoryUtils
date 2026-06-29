@@ -189,6 +189,8 @@ function D4:CreateMinimapButton(params)
                 params:funcL()
             elseif btnName == "RightButton" and params.funcR then
                 params:funcR()
+            elseif btnName == "MiddleButton" and params.funcM then
+                params:funcM()
             end
         end
     )
@@ -232,10 +234,14 @@ function D4:CreateMinimapButton(params)
                         params:funcSL()
                     elseif btnName == "RightButton" and IsShiftKeyDown() and params.funcSR then
                         params:funcSR()
+                    elseif btnName == "MiddleButton" and IsShiftKeyDown() and params.funcSM then
+                        params:funcSM()
                     elseif btnName == "LeftButton" and params.funcL then
                         params:funcL()
                     elseif btnName == "RightButton" and params.funcR then
                         params:funcR()
+                    elseif btnName == "MiddleButton" and params.funcM then
+                        params:funcM()
                     end
                 end,
                 funcOnEnter = function(button)
@@ -260,7 +266,7 @@ function D4:CreateMinimapButton(params)
         btn.fadeOut = btn:CreateAnimationGroup()
         local animOut = btn.fadeOut:CreateAnimation("Alpha")
         animOut:SetOrder(1)
-        animOut:SetDuration(0.2)
+        animOut:SetDuration(0.1)
         if animOut.SetFromAlpha then
             animOut:SetFromAlpha(1)
         end
@@ -269,7 +275,7 @@ function D4:CreateMinimapButton(params)
             animOut:SetToAlpha(0)
         end
 
-        animOut:SetStartDelay(1)
+        animOut:SetStartDelay(0.1)
         if btn.fadeOut and btn.fadeOut.SetToFinalAlpha then
             btn.fadeOut:SetToFinalAlpha(true)
         end
@@ -277,7 +283,7 @@ function D4:CreateMinimapButton(params)
         btn.fadeIn = btn:CreateAnimationGroup()
         local animIn = btn.fadeIn:CreateAnimation("Alpha")
         animIn:SetOrder(1)
-        animIn:SetDuration(0.2)
+        animIn:SetDuration(0.1)
         if animIn.SetFromAlpha then
             animIn:SetFromAlpha(0)
         end
@@ -286,16 +292,19 @@ function D4:CreateMinimapButton(params)
             animIn:SetToAlpha(1)
         end
 
-        animIn:SetStartDelay(0.2)
+        animIn:SetStartDelay(0.1)
         if btn.fadeIn and btn.fadeIn.SetToFinalAlpha then
             btn.fadeIn:SetToFinalAlpha(true)
         end
 
+        local insideBtn = false
+        local insideMinimap = false
         local oldState = false
         local function BtnThink()
-            if oldState ~= MouseIsOver(btn) then
-                oldState = MouseIsOver(btn)
-                if MouseIsOver(btn) then
+            local shouldShow = insideBtn or insideMinimap
+            if oldState ~= shouldShow then
+                oldState = shouldShow
+                if shouldShow then
                     if D4:GetParent(btn) == Minimap then
                         btn.fadeOut:Stop()
                         btn.fadeIn:Play()
@@ -321,6 +330,7 @@ function D4:CreateMinimapButton(params)
         btn:HookScript(
             "OnEnter",
             function()
+                insideBtn = true
                 BtnThink()
             end
         )
@@ -328,6 +338,7 @@ function D4:CreateMinimapButton(params)
         btn:HookScript(
             "OnLeave",
             function()
+                insideBtn = false
                 BtnThink()
             end
         )
@@ -335,6 +346,7 @@ function D4:CreateMinimapButton(params)
         Minimap:HookScript(
             "OnEnter",
             function()
+                insideMinimap = true
                 BtnThink()
             end
         )
@@ -342,6 +354,7 @@ function D4:CreateMinimapButton(params)
         Minimap:HookScript(
             "OnLeave",
             function()
+                insideMinimap = false
                 BtnThink()
             end
         )
