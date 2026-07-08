@@ -1,8 +1,19 @@
 local _, ArmoryUtils = ...
 local ITEM_LEVEL_ABBR = ITEM_LEVEL_ABBR or "ilvl"
 local AUGlowAlpha = 0.75
-local AUClassIDs = {[2]=true, [3]=true, [4]=true, [6]=true, [8]=true}
-local AUSubClassIDs15 = {[5]=true, [6]=true}
+local AUClassIDs = {
+    [2] = true,
+    [3] = true,
+    [4] = true,
+    [6] = true,
+    [8] = true
+}
+
+local AUSubClassIDs15 = {
+    [5] = true,
+    [6] = true
+}
+
 local slotbry = 0
 local AUCharSlots = {"AmmoSlot", "HeadSlot", "NeckSlot", "ShoulderSlot", "ShirtSlot", "ChestSlot", "WaistSlot", "LegsSlot", "FeetSlot", "WristSlot", "HandsSlot", "Finger0Slot", "Finger1Slot", "Trinket0Slot", "Trinket1Slot", "BackSlot", "MainHandSlot", "SecondaryHandSlot", "RangedSlot", "TabardSlot",}
 local AUCharSlotsLeft = {}
@@ -117,7 +128,6 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
 
         SLOT.autext:SetPoint("TOP", SLOT.auinfo, "TOP", 0, 0)
         SLOT.autexth:SetPoint("BOTTOM", SLOT.auinfo, "BOTTOM", 0, 0)
-
         local NormalTexture = SLOT.NormalTexture or _G[name .. "NormalTexture"]
         if NormalTexture then
             local sw, sh = NormalTexture:GetSize()
@@ -735,10 +745,13 @@ function ArmoryUtils:InitItemLevel()
             function(sel, event, ...)
                 if not bagUpdatePending then
                     bagUpdatePending = true
-                    C_Timer.After(0.1, function()
-                        bagUpdatePending = false
-                        ArmoryUtils:UpdateBagsIlvl(event)
-                    end)
+                    C_Timer.After(
+                        0.1,
+                        function()
+                            bagUpdatePending = false
+                            ArmoryUtils:UpdateBagsIlvl(event)
+                        end
+                    )
                 end
             end, "UpdateBagsIlvl"
         )
@@ -764,6 +777,7 @@ function ArmoryUtils:InitItemLevel()
                             search:EnableMouse(false)
                         end
                     end
+
                     cf:HookScript("OnShow", updateSearchVisibility)
                     cf:HookScript("OnHide", updateSearchVisibility)
                     updateSearchVisibility()
@@ -899,7 +913,7 @@ if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetUnit") then
                     local _, unit = tt:GetUnit()
                     if InCombatLockdown() then return end
                     if not pcall(UnitExists, unit) then return end
-                    if unit and UnitIsPlayer(unit) and CanInspect(unit) then
+                    if unit and UnitExists(unit) and UnitIsPlayer(unit) and CanInspect(unit) then
                         local guid = UnitGUID(unit)
                         local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
                         if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
