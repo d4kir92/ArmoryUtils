@@ -349,6 +349,8 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
 
                         if i == 16 and itemEquipLoc and itemEquipLoc == "INVTYPE_2HWEAPON" then
                             sum = sum + ilvl
+                        elseif i == 16 and itemEquipLoc and (itemEquipLoc == "INVTYPE_2HWEAPON" or (ArmoryUtils:GetWoWBuild() == "RETAIL" and (itemEquipLoc == "INVTYPE_RANGED" or itemEquipLoc == "INVTYPE_RANGEDRIGHT"))) then
+                            sum = sum + ilvl
                         end
 
                         if ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true) then
