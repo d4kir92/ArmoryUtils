@@ -35,9 +35,7 @@ local PDThink = CreateFrame("FRAME")
 local AUILVL = nil
 local emptySockets = {}
 for name, v in pairs(_G) do
-    if name and type(name) == "string" and string.find(name, "EMPTY_SOCKET_", 1, true) and not tContains(emptySockets, v) then
-        tinsert(emptySockets, v)
-    end
+    if name and type(name) == "string" and string.find(name, "EMPTY_SOCKET_", 1, true) and not tContains(emptySockets, v) then tinsert(emptySockets, v) end
 end
 
 local lastInspect = 0
@@ -52,14 +50,8 @@ function ArmoryUtils:AddSideText(text)
 end
 
 function ArmoryUtils:UpdateFonts()
-    if AUTAB["ILVLFONTSIZE"] == nil then
-        AUTAB["ILVLFONTSIZE"] = 11
-    end
-
-    if AUTAB["SIDEFONTSIZE"] == nil then
-        AUTAB["SIDEFONTSIZE"] = 11
-    end
-
+    if AUTAB["ILVLFONTSIZE"] == nil then AUTAB["ILVLFONTSIZE"] = 11 end
+    if AUTAB["SIDEFONTSIZE"] == nil then AUTAB["SIDEFONTSIZE"] = 11 end
     local fs1 = AUTAB["ILVLFONTSIZE"]
     for i, text in pairs(ilvlTexts) do
         local font, _, flags = text:GetFont()
@@ -77,10 +69,7 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
     prefix = prefix or ""
     if SLOT and SLOT.auinfo == nil then
         local name = ""
-        if SLOT.GetName then
-            name = ArmoryUtils:GetName(SLOT) or "UID"
-        end
-
+        if SLOT.GetName then name = ArmoryUtils:GetName(SLOT) or "UID" end
         SLOT.auinfo = CreateFrame("FRAME", name .. ".auinfo", SLOT)
         SLOT.auinfo:SetSize(SLOT:GetSize())
         SLOT.auinfo:SetPoint("CENTER", SLOT, "CENTER", 0, 0)
@@ -211,7 +200,6 @@ function ArmoryUtils:IsOffhandAWeapon(unit, slotId)
     local itemID = GetInventoryItemID(unit, slotId)
     if not itemID then return false end
     local _, _, _, _, _, _, _, _, invType = C_Item.GetItemInfo(itemID)
-
     return invType and invType == "INVTYPE_WEAPON"
 end
 
@@ -227,7 +215,10 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             ClearInspectPlayer = function() end
             local originalNotifyInspect = NotifyInspect
             NotifyInspect = function(inspectUnit)
-                if InspectFrame and InspectFrame:IsShown() then return end -- only allow when its closed
+                if InspectFrame and InspectFrame:IsShown() then -- only allow when its closed
+                    return
+                end
+
                 originalNotifyInspect(inspectUnit)
             end
         end
@@ -247,9 +238,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     local ilvl = nil
                     if unit == "player" then
                         local itemLoc = ItemLocation:CreateFromEquipmentSlot(slotId)
-                        if itemLoc and itemLoc:IsValid() then
-                            ilvl = C_Item.GetCurrentItemLevel(itemLoc)
-                        end
+                        if itemLoc and itemLoc:IsValid() then ilvl = C_Item.GetCurrentItemLevel(itemLoc) end
                     else
                         ilvl, _, _ = ArmoryUtils:GetDetailedItemLevelInfo(Link)
                     end
@@ -262,9 +251,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                             local gems = {}
                             for gid = 1, 4 do
                                 local gemLink = select(2, ArmoryUtils:GetItemGem(Link, gid))
-                                if gemLink then
-                                    tinsert(gems, gemLink)
-                                end
+                                if gemLink then tinsert(gems, gemLink) end
                             end
 
                             for x, line in pairs(tooltipData.lines) do
@@ -296,10 +283,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                             if #gems > 0 then
                                 local text = ""
                                 for x, gem in pairs(gems) do
-                                    if x > 1 then
-                                        text = text .. "  "
-                                    end
-
+                                    if x > 1 then text = text .. "  " end
                                     local gemName, _, _, _, _, _, _, _, _, gemIcon, _, gemClassID = ArmoryUtils:GetItemInfo(gem)
                                     if gemName == nil then
                                         text = text .. "|T" .. "Interface/ItemsocketingFrame/UI-EmptySocket-Prismatic" .. ":" .. fontSizeGems .. ":" .. fontSizeGems .. ":0:0|t"
@@ -347,20 +331,11 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                             sum = sum + ilvl
                         end
 
-                        if i == 16 and itemEquipLoc and itemEquipLoc == "INVTYPE_2HWEAPON" then
-                            sum = sum + ilvl
-                        end
-
+                        if i == 16 and itemEquipLoc and itemEquipLoc == "INVTYPE_2HWEAPON" then sum = sum + ilvl end
                         if ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true) then
-                            if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and ilvl and ilvl > 1 then
-                                SLOT.autext:SetText(color.hex .. ilvl)
-                            end
-
+                            if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and ilvl and ilvl > 1 then SLOT.autext:SetText(color.hex .. ilvl) end
                             local alpha = AUGlowAlpha
-                            if color.r == 1 and color.g == 1 and color.b == 1 then
-                                alpha = alpha - 0.2
-                            end
-
+                            if color.r == 1 and color.g == 1 and color.b == 1 then alpha = alpha - 0.2 end
                             if rarity and rarity > 1 and ArmoryUtils:DBGV("ITEMLEVELBORDER", true) then
                                 SLOT.auborder:SetVertexColor(color.r, color.g, color.b, alpha)
                             else
@@ -398,10 +373,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
 
         if count > 0 then
             local max = 17
-            if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-                max = 16
-            end
-
+            if ArmoryUtils:GetWoWBuild() == "RETAIL" then max = 16 end
             AUILVL = string.format("%0.2f", sum / max)
             if frame.ilvl then
                 if ArmoryUtils:GetAUILVL() then
@@ -409,16 +381,12 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                         if characterIlvlHooked == false then
                             characterIlvlHooked = true
                             local setText = false
-                            hooksecurefunc(
-                                CharacterStatsPane.ItemLevelFrame.Value,
-                                "SetText",
-                                function(sel)
-                                    if setText then return end
-                                    setText = true
-                                    sel:SetText(ArmoryUtils:GetAUILVL())
-                                    setText = false
-                                end
-                            )
+                            hooksecurefunc(CharacterStatsPane.ItemLevelFrame.Value, "SetText", function(sel)
+                                if setText then return end
+                                setText = true
+                                sel:SetText(ArmoryUtils:GetAUILVL())
+                                setText = false
+                            end)
                         end
 
                         CharacterStatsPane.ItemLevelFrame.Value:SetText(ArmoryUtils:GetAUILVL())
@@ -427,9 +395,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     end
                 end
 
-                if unit ~= "player" then
-                    lastInspectGUID = nil
-                end
+                if unit ~= "player" then lastInspectGUID = nil end
             end
         elseif frame.ilvl then
             if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value and ArmoryUtils:GetAUILVL() then
@@ -456,12 +422,7 @@ function ArmoryUtils:UpdateBagsIlvl(event)
     if ContainerFrameCombinedBags then
         if bagSetups[ContainerFrameCombinedBags] == nil then
             bagSetups[ContainerFrameCombinedBags] = true
-            ContainerFrameCombinedBags:HookScript(
-                "OnShow",
-                function(sel)
-                    ArmoryUtils:UpdateBag(ContainerFrameCombinedBags)
-                end
-            )
+            ContainerFrameCombinedBags:HookScript("OnShow", function(sel) ArmoryUtils:UpdateBag(ContainerFrameCombinedBags) end)
         end
 
         ArmoryUtils:UpdateBag(ContainerFrameCombinedBags)
@@ -472,12 +433,7 @@ function ArmoryUtils:UpdateBagsIlvl(event)
         if bag then
             if bagSetups[bag] == nil then
                 bagSetups[bag] = true
-                bag:HookScript(
-                    "OnShow",
-                    function(sel)
-                        ArmoryUtils:UpdateBag(bag, x - 1)
-                    end
-                )
+                bag:HookScript("OnShow", function(sel) ArmoryUtils:UpdateBag(bag, x - 1) end)
             end
 
             ArmoryUtils:UpdateBag(bag, x - 1)
@@ -503,10 +459,7 @@ function ArmoryUtils:UpdateBagItem(bagID, size, SLOT, i)
                     end
 
                     local alpha = AUGlowAlpha
-                    if color.r == 1 and color.g == 1 and color.b == 1 then
-                        alpha = alpha - 0.2
-                    end
-
+                    if color.r == 1 and color.g == 1 and color.b == 1 then alpha = alpha - 0.2 end
                     if rarity and rarity > 1 and ArmoryUtils:DBGV("ITEMLEVELBORDER", true) then
                         SLOT.auborder:SetVertexColor(color.r, color.g, color.b, alpha)
                     else
@@ -538,17 +491,12 @@ function ArmoryUtils:UpdateBag(bag, id)
     local size = ArmoryUtils:GetContainerNumSlots(bagID)
     if bag.Items then
         for i, itemButton in bag:EnumerateValidItems() do
-            if itemButton then
-                ArmoryUtils:UpdateBagItem(itemButton:GetBagID(), size, itemButton, itemButton:GetID())
-            end
+            if itemButton then ArmoryUtils:UpdateBagItem(itemButton:GetBagID(), size, itemButton, itemButton:GetID()) end
         end
     else
         for i = 1, size do
             local SLOT = _G[name .. "Item" .. i]
-            if GetCVarBool("combinedBags") then
-                SLOT = _G[name .. "Item" .. i]
-            end
-
+            if GetCVarBool("combinedBags") then SLOT = _G[name .. "Item" .. i] end
             ArmoryUtils:UpdateBagItem(bagID, size, SLOT, SLOT:GetID())
         end
     end
@@ -556,7 +504,6 @@ end
 
 function ArmoryUtils:CheckInspectSlot(slot)
     if ArmoryUtils:GetWoWBuild() == "RETAIL" then return slot ~= "AmmoSlot" and slot ~= "ShirtSlot" and slot ~= "TabardSlot" and slot ~= "RangedSlot" end
-
     return slot ~= "AmmoSlot" and slot ~= "ShirtSlot" and slot ~= "TabardSlot"
 end
 
@@ -564,24 +511,13 @@ function ArmoryUtils:IFUpdateItemInfos()
     if InspectFrame and InspectFrame.unit then
         ArmoryUtils:UpdateChar(InspectPaperDollFrame, InspectFrame.unit, "Inspect", ArmoryUtils.IFUpdateItemInfos)
     else
-        C_Timer.After(
-            0.1,
-            function()
-                ArmoryUtils:IFUpdateItemInfos()
-            end
-        )
+        C_Timer.After(0.1, function() ArmoryUtils:IFUpdateItemInfos() end)
     end
 end
 
 function ArmoryUtils:WaitForInspectFrame()
     if InspectPaperDollFrame == nil then
-        ArmoryUtils:After(
-            0.16,
-            function()
-                ArmoryUtils:WaitForInspectFrame()
-            end, "ArmoryUtils.IFUpdateItemInfos 2"
-        )
-
+        ArmoryUtils:After(0.16, function() ArmoryUtils:WaitForInspectFrame() end, "ArmoryUtils.IFUpdateItemInfos 2")
         return
     end
 
@@ -592,20 +528,12 @@ function ArmoryUtils:WaitForInspectFrame()
 
     local inspect = false
     ArmoryUtils:RegisterEvent(IFThink, "INSPECT_READY")
-    ArmoryUtils:OnEvent(
-        IFThink,
-        function(sel, event, guid, ...)
-            if inspect then return end
-            inspect = true
-            pcall(
-                function()
-                    ArmoryUtils:IFUpdateItemInfos()
-                end
-            )
-
-            inspect = false
-        end, "IFThink"
-    )
+    ArmoryUtils:OnEvent(IFThink, function(sel, event, guid, ...)
+        if inspect then return end
+        inspect = true
+        pcall(function() ArmoryUtils:IFUpdateItemInfos() end)
+        inspect = false
+    end, "IFThink")
 end
 
 local au_settings = nil
@@ -621,15 +549,13 @@ end
 
 function ArmoryUtils:InitSettings()
     AUTAB = AUTAB or {}
-    au_settings = ArmoryUtils:CreateWindow(
-        {
-            ["name"] = "ArmoryUtils",
-            ["pTab"] = {"CENTER"},
-            ["sw"] = 520,
-            ["sh"] = 520,
-            ["title"] = format("|T134952:16:16:0:0|t ArmoryUtils v%s", ArmoryUtils:GetVersion())
-        }
-    )
+    au_settings = ArmoryUtils:CreateWindow({
+        ["name"] = "ArmoryUtils",
+        ["pTab"] = {"CENTER"},
+        ["sw"] = 520,
+        ["sh"] = 520,
+        ["title"] = format("|T134952:16:16:0:0|t ArmoryUtils v%s", ArmoryUtils:GetVersion())
+    })
 
     local x = 15
     local y = 10
@@ -638,42 +564,17 @@ function ArmoryUtils:InitSettings()
     ArmoryUtils:SetAppendParent(au_settings)
     ArmoryUtils:SetAppendTab(AUTAB)
     ArmoryUtils:AppendCategory("GENERAL")
-    ArmoryUtils:AppendCheckbox(
-        "SHOWMINIMAPBUTTON",
-        ArmoryUtils:GetWoWBuild() ~= "RETAIL",
-        function()
-            if ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ArmoryUtils:GetWoWBuild() ~= "RETAIL") then
-                ArmoryUtils:ShowMMBtn("ArmoryUtils")
-            else
-                ArmoryUtils:HideMMBtn("ArmoryUtils")
-            end
+    ArmoryUtils:AppendCheckbox("SHOWMINIMAPBUTTON", ArmoryUtils:GetWoWBuild() ~= "RETAIL", function()
+        if ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ArmoryUtils:GetWoWBuild() ~= "RETAIL") then
+            ArmoryUtils:ShowMMBtn("ArmoryUtils")
+        else
+            ArmoryUtils:HideMMBtn("ArmoryUtils")
         end
-    )
+    end)
 
     ArmoryUtils:AppendCategory("TEXTSIZES")
-    ArmoryUtils:AppendSlider(
-        "ILVLFONTSIZE",
-        11,
-        6,
-        18,
-        1,
-        1,
-        function()
-            ArmoryUtils:UpdateFonts()
-        end
-    )
-
-    ArmoryUtils:AppendSlider(
-        "SIDEFONTSIZE",
-        11,
-        6,
-        14,
-        1,
-        1,
-        function()
-            ArmoryUtils:UpdateFonts()
-        end
-    )
+    ArmoryUtils:AppendSlider("ILVLFONTSIZE", 11, 6, 18, 1, 1, function() ArmoryUtils:UpdateFonts() end)
+    ArmoryUtils:AppendSlider("SIDEFONTSIZE", 11, 6, 14, 1, 1, function() ArmoryUtils:UpdateFonts() end)
 end
 
 function ArmoryUtils:InitItemLevel()
@@ -682,49 +583,21 @@ function ArmoryUtils:InitItemLevel()
             ArmoryUtils:AddIlvl("Character", _G["Character" .. slot], i)
         end
 
-        if PaperDollFrame then
-            PaperDollFrame:HookScript(
-                "OnShow",
-                function()
-                    ArmoryUtils:After(
-                        0.33,
-                        function()
-                            ArmoryUtils:PDUpdateItemInfos()
-                        end, "PaperDollFrameOnShow"
-                    )
-                end
-            )
-        end
-
+        if PaperDollFrame then PaperDollFrame:HookScript("OnShow", function() ArmoryUtils:After(0.33, function() ArmoryUtils:PDUpdateItemInfos() end, "PaperDollFrameOnShow") end) end
         ArmoryUtils:RegisterEvent(PDThink, "PLAYER_EQUIPMENT_CHANGED")
         ArmoryUtils:RegisterEvent(PDThink, "UPDATE_INVENTORY_DURABILITY")
         ArmoryUtils:RegisterEvent(PDThink, "UNIT_INVENTORY_CHANGED ", "player")
         ArmoryUtils:RegisterEvent(PDThink, "ENCHANT_SPELL_COMPLETED")
-        ArmoryUtils:OnEvent(
-            PDThink,
-            function(sel, event, ...)
-                if event == "PLAYER_EQUIPMENT_CHANGED" then
-                    ArmoryUtils:After(
-                        0.34,
-                        function()
-                            ArmoryUtils:PDUpdateItemInfos()
-                        end, "PLAYER_EQUIPMENT_CHANGED"
-                    )
-                elseif event == "ENCHANT_SPELL_COMPLETED" then
-                    local successful, _ = ...
-                    if successful then
-                        ArmoryUtils:After(
-                            0.41,
-                            function()
-                                ArmoryUtils:PDUpdateItemInfos()
-                            end, "ENCHANT_SPELL_COMPLETED"
-                        )
-                    end
-                end
+        ArmoryUtils:OnEvent(PDThink, function(sel, event, ...)
+            if event == "PLAYER_EQUIPMENT_CHANGED" then
+                ArmoryUtils:After(0.34, function() ArmoryUtils:PDUpdateItemInfos() end, "PLAYER_EQUIPMENT_CHANGED")
+            elseif event == "ENCHANT_SPELL_COMPLETED" then
+                local successful, _ = ...
+                if successful then ArmoryUtils:After(0.41, function() ArmoryUtils:PDUpdateItemInfos() end, "ENCHANT_SPELL_COMPLETED") end
+            end
 
-                ArmoryUtils:PDUpdateDurability()
-            end, "PDThink"
-        )
+            ArmoryUtils:PDUpdateDurability()
+        end, "PDThink")
 
         ArmoryUtils:PDUpdateItemInfos()
         ArmoryUtils:WaitForInspectFrame()
@@ -740,21 +613,15 @@ function ArmoryUtils:InitItemLevel()
         ArmoryUtils:RegisterEvent(frame, "INVENTORY_SEARCH_UPDATE")
         ArmoryUtils:RegisterEvent(frame, "BAG_NEW_ITEMS_UPDATED")
         ArmoryUtils:RegisterEvent(frame, "BAG_SLOT_FLAGS_UPDATED")
-        ArmoryUtils:OnEvent(
-            frame,
-            function(sel, event, ...)
-                if not bagUpdatePending then
-                    bagUpdatePending = true
-                    C_Timer.After(
-                        0.1,
-                        function()
-                            bagUpdatePending = false
-                            ArmoryUtils:UpdateBagsIlvl(event)
-                        end
-                    )
-                end
-            end, "UpdateBagsIlvl"
-        )
+        ArmoryUtils:OnEvent(frame, function(sel, event, ...)
+            if not bagUpdatePending then
+                bagUpdatePending = true
+                C_Timer.After(0.1, function()
+                    bagUpdatePending = false
+                    ArmoryUtils:UpdateBagsIlvl(event)
+                end)
+            end
+        end, "UpdateBagsIlvl")
 
         ArmoryUtils:UpdateBagsIlvl()
     end
@@ -794,36 +661,25 @@ function ArmoryUtils:InitItemLevel()
 		BagItemAutoSortButton:SetPushedTexture("bags-button-autosort-down")
 		BagItemAutoSortButton:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
 		]]
-        BagItemAutoSortButton:SetScript(
-            "OnClick",
-            function(sel, ...)
-                PlaySound(SOUNDKIT.UI_BAG_SORTING_01)
-                local SortBags = getglobal("SortBags")
-                if SortBags then
-                    SortBags()
-                elseif C_Container and C_Container.SortBags then
-                    C_Container.SortBags()
-                end
+        BagItemAutoSortButton:SetScript("OnClick", function(sel, ...)
+            PlaySound(SOUNDKIT.UI_BAG_SORTING_01)
+            local SortBags = getglobal("SortBags")
+            if SortBags then
+                SortBags()
+            elseif C_Container and C_Container.SortBags then
+                C_Container.SortBags()
             end
-        )
+        end)
 
-        BagItemAutoSortButton:SetScript(
-            "OnEnter",
-            function(sel, ...)
-                if sel then
-                    GameTooltip:SetOwner(sel, "ANCHOR_TOPLEFT")
-                    GameTooltip:SetText(BAG_CLEANUP_BAGS)
-                    GameTooltip:Show()
-                end
+        BagItemAutoSortButton:SetScript("OnEnter", function(sel, ...)
+            if sel then
+                GameTooltip:SetOwner(sel, "ANCHOR_TOPLEFT")
+                GameTooltip:SetText(BAG_CLEANUP_BAGS)
+                GameTooltip:Show()
             end
-        )
+        end)
 
-        BagItemAutoSortButton:SetScript(
-            "OnLeave",
-            function(sel, ...)
-                GameTooltip_Hide()
-            end
-        )
+        BagItemAutoSortButton:SetScript("OnLeave", function(sel, ...) GameTooltip_Hide() end)
     end
 
     ArmoryUtils:UpdateFonts()
@@ -831,102 +687,86 @@ end
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("INSPECT_READY")
-frame:SetScript(
-    "OnEvent",
-    function(self, event, guid)
-        if event == "INSPECT_READY" and lastInspectGUID and guid == lastInspectGUID then
-            if ArmoryUtils:IsAddonLoaded("TooltipUtils") then
-                frame:UnregisterEvent("INSPECT_READY")
+frame:SetScript("OnEvent", function(self, event, guid)
+    if event == "INSPECT_READY" and lastInspectGUID and guid == lastInspectGUID then
+        if ArmoryUtils:IsAddonLoaded("TooltipUtils") then
+            frame:UnregisterEvent("INSPECT_READY")
+            return
+        end
 
-                return
-            end
-
-            local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
-            if cachedLevel then return end
-            pcall(
-                function()
-                    local _, unit = GameTooltip:GetUnit()
-                    if InCombatLockdown() then return end
-                    if not pcall(UnitExists, unit) then return end
-                    if unit and UnitExists(unit) and UnitGUID(unit) == guid then
-                        if C_PaperDollInfo and C_PaperDollInfo.GetInspectItemLevel then
-                            local ilevel = C_PaperDollInfo.GetInspectItemLevel(unit)
-                            if ilevel and ilevel > 0 then
-                                ArmoryUtils:SaveToItemLevelCache(guid, ilevel)
-                                GameTooltip:AddDoubleLine("ilvl:", format("%d", ilevel))
-                                GameTooltip:Show()
-                            end
-                        else
-                            local ilevel = ArmoryUtils:GetInspectILvl(unit)
-                            if ilevel and ilevel > 0 then
-                                ArmoryUtils:SaveToItemLevelCache(guid, ilevel)
-                                GameTooltip:AddDoubleLine("ilvl:", format("%d", ilevel))
-                                GameTooltip:Show()
-                            end
-                        end
+        local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
+        if cachedLevel then return end
+        pcall(function()
+            local _, unit = GameTooltip:GetUnit()
+            if InCombatLockdown() then return end
+            if not pcall(UnitExists, unit) then return end
+            if unit and UnitExists(unit) and UnitGUID(unit) == guid then
+                if C_PaperDollInfo and C_PaperDollInfo.GetInspectItemLevel then
+                    local ilevel = C_PaperDollInfo.GetInspectItemLevel(unit)
+                    if ilevel and ilevel > 0 then
+                        ArmoryUtils:SaveToItemLevelCache(guid, ilevel)
+                        GameTooltip:AddDoubleLine("ilvl:", format("%d", ilevel))
+                        GameTooltip:Show()
+                    end
+                else
+                    local ilevel = ArmoryUtils:GetInspectILvl(unit)
+                    if ilevel and ilevel > 0 then
+                        ArmoryUtils:SaveToItemLevelCache(guid, ilevel)
+                        GameTooltip:AddDoubleLine("ilvl:", format("%d", ilevel))
+                        GameTooltip:Show()
                     end
                 end
-            )
-        end
+            end
+        end)
     end
-)
+end)
 
 if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
-    TooltipDataProcessor.AddTooltipPostCall(
-        Enum.TooltipDataType.Unit,
-        function(tt, data)
-            if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
-            if not AUTAB["SHOWITEMLEVEL"] then return end
-            pcall(
-                function()
-                    if InspectFrame and InspectFrame:IsShown() then return end
-                    local _, unit = tt:GetUnit()
-                    if InCombatLockdown() then return end
-                    if not pcall(UnitExists, unit) then return end
-                    if unit and UnitExists(unit) and UnitIsPlayer(unit) and CanInspect(unit) then
-                        local guid = UnitGUID(unit)
-                        local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
-                        if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
-                            lastInspect = GetTime() + 2
-                            ArmoryUtils:SaveToInspectCache(guid)
-                            lastInspectGUID = guid
-                            NotifyInspect(unit)
-                        elseif cachedLevel then
-                            tt:AddDoubleLine("ilvl:", format("%d", cachedLevel))
-                            tt:Show()
-                        end
-                    end
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tt, data)
+        if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
+        if not AUTAB["SHOWITEMLEVEL"] then return end
+        pcall(function()
+            if InspectFrame and InspectFrame:IsShown() then return end
+            local _, unit = tt:GetUnit()
+            if InCombatLockdown() then return end
+            if not pcall(UnitExists, unit) then return end
+            if unit and UnitExists(unit) and UnitIsPlayer(unit) and CanInspect(unit) then
+                local guid = UnitGUID(unit)
+                local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
+                if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
+                    lastInspect = GetTime() + 2
+                    ArmoryUtils:SaveToInspectCache(guid)
+                    lastInspectGUID = guid
+                    NotifyInspect(unit)
+                elseif cachedLevel then
+                    tt:AddDoubleLine("ilvl:", format("%d", cachedLevel))
+                    tt:Show()
                 end
-            )
-        end
-    )
+            end
+        end)
+    end)
 end
 
 if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetUnit") then
-    GameTooltip:HookScript(
-        "OnTooltipSetUnit",
-        function(tt, data)
-            if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
-            if not AUTAB["SHOWITEMLEVEL"] then return end
-            pcall(
-                function()
-                    local _, unit = tt:GetUnit()
-                    if InCombatLockdown() then return end
-                    if not pcall(UnitExists, unit) then return end
-                    if unit and UnitExists(unit) and UnitIsPlayer(unit) and CanInspect(unit) then
-                        local guid = UnitGUID(unit)
-                        local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
-                        if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
-                            lastInspect = GetTime() + 2
-                            ArmoryUtils:SaveToInspectCache(guid)
-                            lastInspectGUID = guid
-                            NotifyInspect(unit)
-                        elseif cachedLevel then
-                            tt:AddDoubleLine("ilvl:", format("%d", cachedLevel))
-                        end
-                    end
+    GameTooltip:HookScript("OnTooltipSetUnit", function(tt, data)
+        if ArmoryUtils:IsAddonLoaded("TooltipUtils") then return end
+        if not AUTAB["SHOWITEMLEVEL"] then return end
+        pcall(function()
+            local _, unit = tt:GetUnit()
+            if InCombatLockdown() then return end
+            if not pcall(UnitExists, unit) then return end
+            if unit and UnitExists(unit) and UnitIsPlayer(unit) and CanInspect(unit) then
+                local guid = UnitGUID(unit)
+                local cachedLevel = ArmoryUtils:GetCachedItemLevel(guid)
+                if not cachedLevel and ArmoryUtils:GetInspectCache(guid) == nil and lastInspect < GetTime() then
+                    lastInspect = GetTime() + 2
+                    ArmoryUtils:SaveToInspectCache(guid)
+                    lastInspectGUID = guid
+                    NotifyInspect(unit)
+                elseif cachedLevel then
+                    tt:AddDoubleLine("ilvl:", format("%d", cachedLevel))
                 end
-            )
-        end
-    )
+            end
+        end)
+    end)
 end

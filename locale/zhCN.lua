@@ -1,2 +1,9 @@
 -- zhCN Simplified Chinese
 local _, ArmoryUtils = ...
+ArmoryUtils:AddTrans("zhCN", "LID_GENERAL", "常规")
+ArmoryUtils:AddTrans("zhCN", "LID_SHOWMINIMAPBUTTON", "显示小地图按钮")
+ArmoryUtils:AddTrans("zhCN", "LID_TEXTSIZES", "文字大小")
+ArmoryUtils:AddTrans("zhCN", "LID_ILVLFONTSIZE", "装备等级文字大小: %s")
+ArmoryUtils:AddTrans("zhCN", "LID_SIDEFONTSIZE", "侧边文字大小: %s")
+ArmoryUtils:AddTrans("zhCN", "LID_TOOLTIP", "提示框")
+ArmoryUtils:AddTrans("zhCN", "LID_SHOWITEMLEVEL", "显示装备等级")

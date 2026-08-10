@@ -1,6 +1,5 @@
 -- ruRU Russian
 local _, ArmoryUtils = ...
-
 ArmoryUtils:AddTrans("ruRU", "LID_GENERAL", "Основное")
 ArmoryUtils:AddTrans("ruRU", "LID_SHOWMINIMAPBUTTON", "Показывать иконку на миникарте")
 ArmoryUtils:AddTrans("ruRU", "LID_TEXTSIZES", "Размеры текста")
