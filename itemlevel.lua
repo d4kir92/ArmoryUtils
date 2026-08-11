@@ -172,19 +172,6 @@ function ArmoryUtils:PDUpdateDurability()
     end
 end
 
-local function IsSlotEnchanted(unit, slotId)
-    local itemLink = GetInventoryItemLink(unit, slotId)
-    if not itemLink then return false, "Kein Item" end
-    -- Wir extrahieren die enchantID aus dem Link
-    local _, _, enchantID = string.find(itemLink, "item:%d+:(%d+)")
-    enchantID = tonumber(enchantID)
-    if enchantID and enchantID > 0 then
-        return true, enchantID
-    else
-        return false, 0
-    end
-end
-
 local enchantSlots = {}
 enchantSlots["RETAIL"] = {}
 enchantSlots["RETAIL"][1] = true
