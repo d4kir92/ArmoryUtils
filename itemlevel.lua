@@ -75,18 +75,21 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
         SLOT.auinfo:SetPoint("CENTER", SLOT, "CENTER", 0, 0)
         SLOT.auinfo:SetFrameLevel(200)
         SLOT.auinfo:EnableMouse(false)
-        SLOT.autext = SLOT.auinfo:CreateFontString(nil, "OVERLAY")
+        SLOT.autext = SLOT.auinfo:CreateFontString("SLOT.autext", "OVERLAY")
         SLOT.autext:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
         SLOT.autext:SetShadowOffset(1, -1)
-        SLOT.autexth = SLOT.auinfo:CreateFontString(nil, "OVERLAY")
+        SLOT.autexth = SLOT.auinfo:CreateFontString("SLOT.autexth", "OVERLAY")
         SLOT.autexth:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
         SLOT.autexth:SetShadowOffset(1, -1)
-        SLOT.autexte = SLOT.auinfo:CreateFontString(nil, "OVERLAY")
+        SLOT.autexte = SLOT.auinfo:CreateFontString("SLOT.autexte", "OVERLAY")
         SLOT.autexte:SetFont(STANDARD_TEXT_FONT, fontSizeEnchants, "OUTLINE")
         SLOT.autexte:SetShadowOffset(1, -1)
-        SLOT.autextg = SLOT.auinfo:CreateFontString(nil, "OVERLAY")
+        SLOT.autextg = SLOT.auinfo:CreateFontString("SLOT.autextg", "OVERLAY")
         SLOT.autextg:SetFont(STANDARD_TEXT_FONT, fontSizeGems, "OUTLINE")
         SLOT.autextg:SetShadowOffset(1, -1)
+        SLOT.autextu = SLOT.auinfo:CreateFontString("SLOT.autextu", "OVERLAY")
+        SLOT.autextu:SetFont(STANDARD_TEXT_FONT, 10, "OUTLINE")
+        SLOT.autextu:SetShadowOffset(1, -1)
         SLOT.auborder = SLOT.auinfo:CreateTexture("SLOT.auborder", "OVERLAY")
         SLOT.auborder:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
         SLOT.auborder:SetBlendMode("ADD")
@@ -96,6 +99,7 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
         ArmoryUtils:AddSideText(SLOT.autextg)
         local px = 8
         slotbry = 3
+        SLOT.autextu:SetPoint("CENTER", SLOT.auinfo, "CENTER", 0, 0)
         if AUCharSlotsLeft[name] then
             if i == 17 or i == 18 then
                 SLOT.autexte:SetPoint("BOTTOMLEFT", SLOT.auinfo, "BOTTOMRIGHT", px, slotbry)
@@ -301,38 +305,49 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                         SLOT.autextg:SetText("")
                     end
 
-                    if ilvl and color then
-                        if slot == "AmmoSlot" then
-                            local COUNT = _G["Character" .. slot .. "Count"]
-                            if COUNT.hooked == nil then
-                                COUNT.hooked = true
-                                COUNT:SetFont(STANDARD_TEXT_FONT, 9, "THINOUTLINE")
-                                SLOT.maxDisplayCount = 999999
-                                COUNT:SetText(COUNT:GetText())
+                    if color then
+                        if C_Item and C_Item.GetItemUpgradeInfo then
+                            local upgrade = C_Item.GetItemUpgradeInfo(Link)
+                            if upgrade and upgrade.maxLevel > 0 and upgrade.currentLevel ~= upgrade.maxLevel then
+                                SLOT.autextu:SetText(string.format("%s%s/%s", color.hex, upgrade.currentLevel, upgrade.maxLevel))
+                            else
+                                SLOT.autextu:SetText("")
                             end
                         end
 
-                        -- ignore: shirt, tabard, ammo
-                        if i ~= 4 and i ~= 19 and i ~= 20 and ilvl and ilvl > 1 then
-                            count = count + 1
-                            sum = sum + ilvl
-                        end
+                        if ilvl then
+                            if slot == "AmmoSlot" then
+                                local COUNT = _G["Character" .. slot .. "Count"]
+                                if COUNT.hooked == nil then
+                                    COUNT.hooked = true
+                                    COUNT:SetFont(STANDARD_TEXT_FONT, 9, "THINOUTLINE")
+                                    SLOT.maxDisplayCount = 999999
+                                    COUNT:SetText(COUNT:GetText())
+                                end
+                            end
 
-                        if i == 16 and itemEquipLoc and itemEquipLoc == "INVTYPE_2HWEAPON" then sum = sum + ilvl end
-                        if ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true) then
-                            if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and ilvl and ilvl > 1 then SLOT.autext:SetText(color.hex .. ilvl) end
-                            local alpha = AUGlowAlpha
-                            if color.r == 1 and color.g == 1 and color.b == 1 then alpha = alpha - 0.2 end
-                            if rarity and rarity > 1 and ArmoryUtils:DBGV("ITEMLEVELBORDER", true) then
-                                SLOT.auborder:SetVertexColor(color.r, color.g, color.b, alpha)
+                            -- ignore: shirt, tabard, ammo
+                            if i ~= 4 and i ~= 19 and i ~= 20 and ilvl and ilvl > 1 then
+                                count = count + 1
+                                sum = sum + ilvl
+                            end
+
+                            if i == 16 and itemEquipLoc and itemEquipLoc == "INVTYPE_2HWEAPON" then sum = sum + ilvl end
+                            if ArmoryUtils:DBGV("ITEMLEVEL" .. unit, true) then
+                                if not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and ilvl and ilvl > 1 then SLOT.autext:SetText(color.hex .. ilvl) end
+                                local alpha = AUGlowAlpha
+                                if color.r == 1 and color.g == 1 and color.b == 1 then alpha = alpha - 0.2 end
+                                if rarity and rarity > 1 and ArmoryUtils:DBGV("ITEMLEVELBORDER", true) then
+                                    SLOT.auborder:SetVertexColor(color.r, color.g, color.b, alpha)
+                                else
+                                    SLOT.auborder:SetVertexColor(1, 1, 1, 0)
+                                end
                             else
+                                SLOT.autext:SetText("")
+                                SLOT.autexte:SetText("")
+                                SLOT.autextg:SetText("")
                                 SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                             end
-                        else
-                            SLOT.autext:SetText("")
-                            SLOT.autexte:SetText("")
-                            SLOT.autextg:SetText("")
-                            SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                         end
                     end
                 else
