@@ -1,12 +1,11 @@
 local _, ArmoryUtils = ...
 local ICON = 134952
-local VERSION = "1.1.74"
+local VERSION = "1.2.0"
 local DEFAULT_WIDTH = 460
 local DEFAULT_HEIGHT = 520
 local DEFAULT_ILVLFONTSIZE = 11
 local DEFAULT_SIDEFONTSIZE = 11
 local au_settings = nil
-
 local function ShowMinimapButtonDefault()
     return ArmoryUtils:GetWoWBuild() ~= "RETAIL"
 end
@@ -15,6 +14,7 @@ local function ApplyDefaults()
     AUTAB = AUTAB or {}
     ArmoryUtils:SV(AUTAB, "SHOWMINIMAPBUTTON", ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ShowMinimapButtonDefault()))
     ArmoryUtils:SV(AUTAB, "SHOWITEMLEVEL", ArmoryUtils:GV(AUTAB, "SHOWITEMLEVEL", true))
+    ArmoryUtils:SV(AUTAB, "ENCHANTONLYICON", ArmoryUtils:GV(AUTAB, "ENCHANTONLYICON", true))
     ArmoryUtils:SV(AUTAB, "ILVLFONTSIZE", ArmoryUtils:GV(AUTAB, "ILVLFONTSIZE", DEFAULT_ILVLFONTSIZE))
     ArmoryUtils:SV(AUTAB, "SIDEFONTSIZE", ArmoryUtils:GV(AUTAB, "SIDEFONTSIZE", DEFAULT_SIDEFONTSIZE))
 end
@@ -23,7 +23,6 @@ local function GetCollapsed(key)
     if key == nil then return nil end
     if type(AUTAB) ~= "table" then return nil end
     if type(AUTAB["COLLAPSED"]) ~= "table" then return nil end
-
     return AUTAB["COLLAPSED"][key]
 end
 
@@ -78,6 +77,21 @@ function ArmoryUtils:InitSettings()
             else
                 ArmoryUtils:HideMMBtn("ArmoryUtils")
             end
+        end
+    })
+
+    au_settings:AddCategory({
+        ["label"] = "LID_ENCHANTS",
+        ["key"] = "ENCHANTS"
+    })
+
+    au_settings:AddCheckbox({
+        ["label"] = "LID_ENCHANTONLYICON",
+        ["search"] = "ENCHANTONLYICON",
+        ["value"] = ArmoryUtils:GV(AUTAB, "ENCHANTONLYICON", true),
+        ["func"] = function(value)
+            ArmoryUtils:SV(AUTAB, "ENCHANTONLYICON", value)
+            ArmoryUtils:PDUpdateItemInfos()
         end
     })
 

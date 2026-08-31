@@ -2,6 +2,8 @@
 local _, ArmoryUtils = ...
 ArmoryUtils:AddTrans("zhCN", "LID_GENERAL", "常规")
 ArmoryUtils:AddTrans("zhCN", "LID_SHOWMINIMAPBUTTON", "显示小地图按钮")
+ArmoryUtils:AddTrans("zhCN", "LID_ENCHANTS", "附魔")
+ArmoryUtils:AddTrans("zhCN", "LID_ENCHANTONLYICON", "仅显示附魔图标")
 ArmoryUtils:AddTrans("zhCN", "LID_TEXTSIZES", "文字大小")
 ArmoryUtils:AddTrans("zhCN", "LID_ILVLFONTSIZE", "装备等级文字大小: %s")
 ArmoryUtils:AddTrans("zhCN", "LID_SIDEFONTSIZE", "侧边文字大小: %s")

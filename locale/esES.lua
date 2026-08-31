@@ -2,6 +2,8 @@
 local _, ArmoryUtils = ...
 ArmoryUtils:AddTrans("esES", "LID_GENERAL", "General")
 ArmoryUtils:AddTrans("esES", "LID_SHOWMINIMAPBUTTON", "Mostrar botón del minimapa")
+ArmoryUtils:AddTrans("esES", "LID_ENCHANTS", "Encantamientos")
+ArmoryUtils:AddTrans("esES", "LID_ENCHANTONLYICON", "Solo icono de encantamiento")
 ArmoryUtils:AddTrans("esES", "LID_TEXTSIZES", "Tamaños de texto")
 ArmoryUtils:AddTrans("esES", "LID_ILVLFONTSIZE", "Tamaño del texto de nivel de objeto: %s")
 ArmoryUtils:AddTrans("esES", "LID_SIDEFONTSIZE", "Tamaño de los textos laterales: %s")

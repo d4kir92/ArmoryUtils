@@ -194,6 +194,13 @@ function ArmoryUtils:IsOffhandAWeapon(unit, slotId)
     return invType and invType == "INVTYPE_WEAPON"
 end
 
+local function ShortenEnchant(text)
+    if text == nil then return text end
+    local short = string.match(text, "%-%s+(.+)$")
+    if short and short ~= "" then return short end
+    return text
+end
+
 local fixedInspect = true
 local characterIlvlHooked = false
 function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
@@ -252,13 +259,16 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                                     foundEnchant = true
                                     if string.find(enchantString, "|A:") then
                                         local itemEnchant, itemEnchantAtlas = string.match(enchantString, "(.*)|A:(.*):20:20|a")
-                                        if ArmoryUtils:DBGV("ITEMLEVELSYSTEMSIDEWAYS", true) then
+                                        itemEnchant = ShortenEnchant(itemEnchant)
+                                        if ArmoryUtils:DBGV("ENCHANTONLYICON", true) then
+                                            SLOT.autexte:SetText("|cFF00FF00|A:" .. itemEnchantAtlas .. ":16:16:0:0|a")
+                                        elseif ArmoryUtils:DBGV("ITEMLEVELSYSTEMSIDEWAYS", true) then
                                             SLOT.autexte:SetText("|cFF00FF00|A:" .. itemEnchantAtlas .. ":16:16:0:0|a " .. string.sub(itemEnchant, 1, 12) .. "..." .. "|r")
                                         else
                                             SLOT.autexte:SetText("|cFF00FF00|A:" .. itemEnchantAtlas .. ":24:24:0:0|a")
                                         end
                                     else
-                                        local itemEnchant = enchantString
+                                        local itemEnchant = ShortenEnchant(enchantString)
                                         SLOT.autexte:SetText("|cFF00FF00" .. itemEnchant .. "|r")
                                     end
                                 end

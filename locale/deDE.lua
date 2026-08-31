@@ -2,6 +2,8 @@
 local _, ArmoryUtils = ...
 ArmoryUtils:AddTrans("deDE", "LID_GENERAL", "Allgemein")
 ArmoryUtils:AddTrans("deDE", "LID_SHOWMINIMAPBUTTON", "Minimapknopf anzeigen")
+ArmoryUtils:AddTrans("deDE", "LID_ENCHANTS", "Verzauberungen")
+ArmoryUtils:AddTrans("deDE", "LID_ENCHANTONLYICON", "Verzauberung nur Symbol")
 ArmoryUtils:AddTrans("deDE", "LID_TEXTSIZES", "Textgrößen")
 ArmoryUtils:AddTrans("deDE", "LID_ILVLFONTSIZE", "Itemlevel Textgröße: %s")
 ArmoryUtils:AddTrans("deDE", "LID_SIDEFONTSIZE", "Seitliche Texte Textgröße: %s")
