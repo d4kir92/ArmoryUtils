@@ -1,6 +1,6 @@
 local _, ArmoryUtils = ...
 local ICON = 134952
-local VERSION = "1.2.0"
+local VERSION = "1.2.1"
 local DEFAULT_WIDTH = 460
 local DEFAULT_HEIGHT = 520
 local DEFAULT_ILVLFONTSIZE = 11
@@ -155,7 +155,7 @@ AUTABSetup:SetScript("OnEvent", function(self, event, ...)
             ["icon"] = ICON,
             ["dbtab"] = AUTAB,
             ["dbkey"] = "SHOWMINIMAPBUTTON",
-            ["vTT"] = {{"ArmoryUtils", "v" .. ArmoryUtils:GetVersion()}, {ArmoryUtils:Trans("LID_LEFTCLICK"), ArmoryUtils:Trans("LID_OPENSETTINGS")}, {ArmoryUtils:Trans("LID_RIGHTCLICK"), ArmoryUtils:Trans("LID_HIDEMINIMAPBUTTON")}},
+            ["vTT"] = {{format("|T%d:16:16:0:0|t ArmoryUtils", ICON), "v" .. ArmoryUtils:GetVersion()}, {ArmoryUtils:Trans("LID_LEFTCLICK"), ArmoryUtils:Trans("LID_OPENSETTINGS")}, {ArmoryUtils:Trans("LID_RIGHTCLICK"), ArmoryUtils:Trans("LID_HIDEMINIMAPBUTTON")}},
             ["funcL"] = function() ArmoryUtils:ToggleSettings() end,
             ["funcR"] = function()
                 ArmoryUtils:SV(AUTAB, "SHOWMINIMAPBUTTON", false)
