@@ -538,47 +538,6 @@ function ArmoryUtils:WaitForInspectFrame()
     end, "IFThink")
 end
 
-local au_settings = nil
-function ArmoryUtils:ToggleSettings()
-    if au_settings then
-        if au_settings:IsShown() then
-            au_settings:Hide()
-        else
-            au_settings:Show()
-        end
-    end
-end
-
-function ArmoryUtils:InitSettings()
-    AUTAB = AUTAB or {}
-    au_settings = ArmoryUtils:CreateWindow({
-        ["name"] = "ArmoryUtils",
-        ["pTab"] = {"CENTER"},
-        ["sw"] = 520,
-        ["sh"] = 520,
-        ["title"] = format("|T134952:16:16:0:0|t ArmoryUtils v%s", ArmoryUtils:GetVersion())
-    })
-
-    local x = 15
-    local y = 10
-    ArmoryUtils:SetAppendX(x)
-    ArmoryUtils:SetAppendY(y)
-    ArmoryUtils:SetAppendParent(au_settings)
-    ArmoryUtils:SetAppendTab(AUTAB)
-    ArmoryUtils:AppendCategory("GENERAL")
-    ArmoryUtils:AppendCheckbox("SHOWMINIMAPBUTTON", ArmoryUtils:GetWoWBuild() ~= "RETAIL", function()
-        if ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ArmoryUtils:GetWoWBuild() ~= "RETAIL") then
-            ArmoryUtils:ShowMMBtn("ArmoryUtils")
-        else
-            ArmoryUtils:HideMMBtn("ArmoryUtils")
-        end
-    end)
-
-    ArmoryUtils:AppendCategory("TEXTSIZES")
-    ArmoryUtils:AppendSlider("ILVLFONTSIZE", 11, 6, 18, 1, 1, function() ArmoryUtils:UpdateFonts() end)
-    ArmoryUtils:AppendSlider("SIDEFONTSIZE", 11, 6, 14, 1, 1, function() ArmoryUtils:UpdateFonts() end)
-end
-
 function ArmoryUtils:InitItemLevel()
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) and PaperDollFrame then
         for i, slot in pairs(AUCharSlots) do

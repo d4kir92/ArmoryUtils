@@ -1,67 +1,155 @@
 local _, ArmoryUtils = ...
+local ICON = 134952
+local VERSION = "1.1.74"
+local DEFAULT_WIDTH = 460
+local DEFAULT_HEIGHT = 520
+local DEFAULT_ILVLFONTSIZE = 11
+local DEFAULT_SIDEFONTSIZE = 11
+local au_settings = nil
+
+local function ShowMinimapButtonDefault()
+    return ArmoryUtils:GetWoWBuild() ~= "RETAIL"
+end
+
+local function ApplyDefaults()
+    AUTAB = AUTAB or {}
+    ArmoryUtils:SV(AUTAB, "SHOWMINIMAPBUTTON", ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ShowMinimapButtonDefault()))
+    ArmoryUtils:SV(AUTAB, "SHOWITEMLEVEL", ArmoryUtils:GV(AUTAB, "SHOWITEMLEVEL", true))
+    ArmoryUtils:SV(AUTAB, "ILVLFONTSIZE", ArmoryUtils:GV(AUTAB, "ILVLFONTSIZE", DEFAULT_ILVLFONTSIZE))
+    ArmoryUtils:SV(AUTAB, "SIDEFONTSIZE", ArmoryUtils:GV(AUTAB, "SIDEFONTSIZE", DEFAULT_SIDEFONTSIZE))
+end
+
+local function GetCollapsed(key)
+    if key == nil then return nil end
+    if type(AUTAB) ~= "table" then return nil end
+    if type(AUTAB["COLLAPSED"]) ~= "table" then return nil end
+
+    return AUTAB["COLLAPSED"][key]
+end
+
+local function SetCollapsed(key, collapsed)
+    if key == nil then return end
+    if type(AUTAB) ~= "table" then return end
+    if type(AUTAB["COLLAPSED"]) ~= "table" then AUTAB["COLLAPSED"] = {} end
+    if collapsed then
+        AUTAB["COLLAPSED"][key] = true
+    else
+        AUTAB["COLLAPSED"][key] = nil
+    end
+end
+
+function ArmoryUtils:ToggleSettings()
+    if au_settings then au_settings:Toggle() end
+end
+
+function ArmoryUtils:InitSettings()
+    ApplyDefaults()
+    au_settings = ArmoryUtils:CreateUIWindow({
+        ["name"] = "ArmoryUtilsSettings",
+        ["pTab"] = {"CENTER"},
+        ["width"] = ArmoryUtils:GV(AUTAB, "WINDOWWIDTH", DEFAULT_WIDTH),
+        ["height"] = ArmoryUtils:GV(AUTAB, "WINDOWHEIGHT", DEFAULT_HEIGHT),
+        ["minWidth"] = 360,
+        ["minHeight"] = 240,
+        ["onResize"] = function(width, height)
+            ArmoryUtils:SV(AUTAB, "WINDOWWIDTH", width)
+            ArmoryUtils:SV(AUTAB, "WINDOWHEIGHT", height)
+        end,
+        ["getCollapsed"] = function(key) return GetCollapsed(key) end,
+        ["setCollapsed"] = function(key, collapsed) SetCollapsed(key, collapsed) end,
+        ["title"] = format("|T%d:16:16:0:0|t ArmoryUtils v%s", ICON, ArmoryUtils:GetVersion())
+    })
+
+    au_settings:SuspendLayout()
+    au_settings:AddSearch()
+    au_settings:AddCategory({
+        ["label"] = "LID_GENERAL",
+        ["key"] = "GENERAL"
+    })
+
+    au_settings:AddCheckbox({
+        ["label"] = "LID_SHOWMINIMAPBUTTON",
+        ["search"] = "SHOWMINIMAPBUTTON",
+        ["value"] = ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ShowMinimapButtonDefault()),
+        ["func"] = function(value)
+            ArmoryUtils:SV(AUTAB, "SHOWMINIMAPBUTTON", value)
+            if value then
+                ArmoryUtils:ShowMMBtn("ArmoryUtils")
+            else
+                ArmoryUtils:HideMMBtn("ArmoryUtils")
+            end
+        end
+    })
+
+    au_settings:AddCategory({
+        ["label"] = "LID_TEXTSIZES",
+        ["key"] = "TEXTSIZES"
+    })
+
+    au_settings:AddSlider({
+        ["label"] = "LID_ILVLFONTSIZE",
+        ["search"] = "ILVLFONTSIZE",
+        ["value"] = ArmoryUtils:GV(AUTAB, "ILVLFONTSIZE", DEFAULT_ILVLFONTSIZE),
+        ["min"] = 6,
+        ["max"] = 18,
+        ["step"] = 1,
+        ["decimals"] = 0,
+        ["func"] = function(value)
+            ArmoryUtils:SV(AUTAB, "ILVLFONTSIZE", value)
+            ArmoryUtils:UpdateFonts()
+        end
+    })
+
+    au_settings:AddSlider({
+        ["label"] = "LID_SIDEFONTSIZE",
+        ["search"] = "SIDEFONTSIZE",
+        ["value"] = ArmoryUtils:GV(AUTAB, "SIDEFONTSIZE", DEFAULT_SIDEFONTSIZE),
+        ["min"] = 6,
+        ["max"] = 14,
+        ["step"] = 1,
+        ["decimals"] = 0,
+        ["func"] = function(value)
+            ArmoryUtils:SV(AUTAB, "SIDEFONTSIZE", value)
+            ArmoryUtils:UpdateFonts()
+        end
+    })
+
+    au_settings:AddCategory({
+        ["label"] = "LID_TOOLTIP",
+        ["key"] = "TOOLTIP"
+    })
+
+    au_settings:AddCheckbox({
+        ["label"] = "LID_SHOWITEMLEVEL",
+        ["search"] = "SHOWITEMLEVEL",
+        ["value"] = ArmoryUtils:GV(AUTAB, "SHOWITEMLEVEL", true),
+        ["func"] = function(value) ArmoryUtils:SV(AUTAB, "SHOWITEMLEVEL", value) end
+    })
+
+    au_settings:ResumeLayout()
+end
+
 local AUTABSetup = CreateFrame("FRAME", "AUTABSetup")
 ArmoryUtils:RegisterEvent(AUTABSetup, "PLAYER_LOGIN")
 AUTABSetup:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
         AUTAB = AUTAB or {}
-        ArmoryUtils:SetVersion(134952, "1.1.74")
-        ArmoryUtils:SetAddonOutput("ArmoryUtils", 134952)
-        local mmbtn = nil
+        ArmoryUtils:SetVersion(ICON, VERSION)
+        ArmoryUtils:SetAddonOutput("ArmoryUtils", ICON)
         ArmoryUtils:CreateMinimapButton({
             ["name"] = "ArmoryUtils",
-            ["icon"] = 134952,
-            ["var"] = mmbtn,
+            ["icon"] = ICON,
             ["dbtab"] = AUTAB,
+            ["dbkey"] = "SHOWMINIMAPBUTTON",
             ["vTT"] = {{"ArmoryUtils", "v" .. ArmoryUtils:GetVersion()}, {ArmoryUtils:Trans("LID_LEFTCLICK"), ArmoryUtils:Trans("LID_OPENSETTINGS")}, {ArmoryUtils:Trans("LID_RIGHTCLICK"), ArmoryUtils:Trans("LID_HIDEMINIMAPBUTTON")}},
             ["funcL"] = function() ArmoryUtils:ToggleSettings() end,
             ["funcR"] = function()
                 ArmoryUtils:SV(AUTAB, "SHOWMINIMAPBUTTON", false)
                 ArmoryUtils:HideMMBtn("ArmoryUtils")
                 ArmoryUtils:MSG("Minimap Button is now hidden.")
-            end,
-            ["dbkey"] = "SHOWMINIMAPBUTTON"
+            end
         })
 
         ArmoryUtils:InitSettings()
     end
 end)
-
-local au_settings = nil
-function ArmoryUtils:ToggleSettings()
-    if au_settings then
-        if au_settings:IsShown() then
-            au_settings:Hide()
-        else
-            au_settings:Show()
-        end
-    end
-end
-
-function ArmoryUtils:InitSettings()
-    AUTAB = AUTAB or {}
-    au_settings = ArmoryUtils:CreateWindow({
-        ["name"] = "ArmoryUtils",
-        ["pTab"] = {"CENTER"},
-        ["sw"] = 520,
-        ["sh"] = 520,
-        ["title"] = format("ArmoryUtils v%s", ArmoryUtils:GetVersion())
-    })
-
-    local x = 15
-    local y = 10
-    ArmoryUtils:SetAppendX(x)
-    ArmoryUtils:SetAppendY(y)
-    ArmoryUtils:SetAppendParent(au_settings)
-    ArmoryUtils:SetAppendTab(AUTAB)
-    ArmoryUtils:AppendCategory("GENERAL")
-    ArmoryUtils:AppendCheckbox("SHOWMINIMAPBUTTON", ArmoryUtils:GetWoWBuild() ~= "RETAIL", function()
-        if ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ArmoryUtils:GetWoWBuild() ~= "RETAIL") then
-            ArmoryUtils:ShowMMBtn("ArmoryUtils")
-        else
-            ArmoryUtils:HideMMBtn("ArmoryUtils")
-        end
-    end)
-
-    ArmoryUtils:AppendCategory("TOOLTIP")
-    ArmoryUtils:AppendCheckbox("SHOWITEMLEVEL", true)
-end
