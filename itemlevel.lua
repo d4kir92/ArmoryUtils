@@ -555,16 +555,34 @@ function ArmoryUtils:InitItemLevel()
         end
 
         if PaperDollFrame then PaperDollFrame:HookScript("OnShow", function() ArmoryUtils:After(0.33, function() ArmoryUtils:PDUpdateItemInfos() end, "PaperDollFrameOnShow") end) end
+        local pdUpdatePending = false
+        local function PDUpdateSoon(delay, from)
+            if pdUpdatePending then return end
+            pdUpdatePending = true
+            ArmoryUtils:After(delay, function()
+                pdUpdatePending = false
+                ArmoryUtils:PDUpdateItemInfos()
+            end, from)
+        end
+
         ArmoryUtils:RegisterEvent(PDThink, "PLAYER_EQUIPMENT_CHANGED")
         ArmoryUtils:RegisterEvent(PDThink, "UPDATE_INVENTORY_DURABILITY")
-        ArmoryUtils:RegisterEvent(PDThink, "UNIT_INVENTORY_CHANGED ", "player")
+        ArmoryUtils:RegisterEvent(PDThink, "UNIT_INVENTORY_CHANGED", "player")
         ArmoryUtils:RegisterEvent(PDThink, "ENCHANT_SPELL_COMPLETED")
+        ArmoryUtils:RegisterEvent(PDThink, "SOCKET_INFO_SUCCESS")
+        ArmoryUtils:RegisterEvent(PDThink, "SOCKET_INFO_UPDATE")
+        ArmoryUtils:RegisterEvent(PDThink, "SOCKET_INFO_CLOSE")
+        ArmoryUtils:RegisterEvent(PDThink, "ITEM_CHANGED")
         ArmoryUtils:OnEvent(PDThink, function(sel, event, ...)
             if event == "PLAYER_EQUIPMENT_CHANGED" then
-                ArmoryUtils:After(0.34, function() ArmoryUtils:PDUpdateItemInfos() end, "PLAYER_EQUIPMENT_CHANGED")
+                PDUpdateSoon(0.41, "PLAYER_EQUIPMENT_CHANGED")
             elseif event == "ENCHANT_SPELL_COMPLETED" then
                 local successful, _ = ...
-                if successful then ArmoryUtils:After(0.41, function() ArmoryUtils:PDUpdateItemInfos() end, "ENCHANT_SPELL_COMPLETED") end
+                if successful then PDUpdateSoon(0.41, "ENCHANT_SPELL_COMPLETED") end
+            elseif event == "UNIT_INVENTORY_CHANGED" or event == "ITEM_CHANGED" then
+                PDUpdateSoon(0.41, event)
+            elseif event == "SOCKET_INFO_SUCCESS" or event == "SOCKET_INFO_UPDATE" or event == "SOCKET_INFO_CLOSE" then
+                PDUpdateSoon(0.41, event)
             end
 
             ArmoryUtils:PDUpdateDurability()
