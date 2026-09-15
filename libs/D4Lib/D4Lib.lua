@@ -32,6 +32,12 @@ function D4:GetWoWBuild()
     return buildName
 end
 
+function D4:IsSecret(value)
+    local isSecret = _G["issecretvalue"]
+    if type(isSecret) ~= "function" then return false end
+    return isSecret(value) == true
+end
+
 D4.oldWow = D4.oldWow or false
 if _G["C_Timer"] == nil then
     D4:MSG("[D4] ADD MISSING: C_Timer")
@@ -718,8 +724,10 @@ function D4:GetClassAtlas(class)
     return ("classicon-%s"):format(class)
 end
 
-function D4:GetClassIcon(class)
-    return "|A:" .. D4:GetClassAtlas(class) .. ":16:16:0:0|a"
+function D4:GetClassIcon(class, size)
+    size = tonumber(size) or 16
+    if size < 0 then size = 0 end
+    return "|A:" .. D4:GetClassAtlas(class) .. ":" .. size .. ":" .. size .. ":0:0|a"
 end
 
 function D4:GetRaceAtlas(race, gender)
@@ -1085,6 +1093,7 @@ function D4:GetRoleByGuid(guid)
 end
 
 function D4:GetRoleIcon(role)
+    if D4:IsSecret(role) then return "" end
     if role == "" then return "" end
     if role == "NONE" then return "" end
     if role == "DAMAGER" then
