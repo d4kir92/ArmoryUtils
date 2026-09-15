@@ -318,7 +318,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     if color then
                         if C_Item and C_Item.GetItemUpgradeInfo then
                             local upgrade = C_Item.GetItemUpgradeInfo(Link)
-                            if upgrade and upgrade.maxLevel > 0 and upgrade.currentLevel ~= upgrade.maxLevel then
+                            if upgrade and upgrade.maxLevel > 0 and (upgrade.currentLevel ~= upgrade.maxLevel or not ArmoryUtils:DBGV("HIDEMAXUPGRADE", false)) then
                                 SLOT.autextu:SetText(string.format("%s%s/%s", color.hex, upgrade.currentLevel, upgrade.maxLevel))
                             else
                                 SLOT.autextu:SetText("")

@@ -15,6 +15,7 @@ local function ApplyDefaults()
     ArmoryUtils:SV(AUTAB, "SHOWMINIMAPBUTTON", ArmoryUtils:GV(AUTAB, "SHOWMINIMAPBUTTON", ShowMinimapButtonDefault()))
     ArmoryUtils:SV(AUTAB, "SHOWITEMLEVEL", ArmoryUtils:GV(AUTAB, "SHOWITEMLEVEL", true))
     ArmoryUtils:SV(AUTAB, "ENCHANTONLYICON", ArmoryUtils:GV(AUTAB, "ENCHANTONLYICON", true))
+    ArmoryUtils:SV(AUTAB, "HIDEMAXUPGRADE", ArmoryUtils:GV(AUTAB, "HIDEMAXUPGRADE", false))
     ArmoryUtils:SV(AUTAB, "ILVLFONTSIZE", ArmoryUtils:GV(AUTAB, "ILVLFONTSIZE", DEFAULT_ILVLFONTSIZE))
     ArmoryUtils:SV(AUTAB, "SIDEFONTSIZE", ArmoryUtils:GV(AUTAB, "SIDEFONTSIZE", DEFAULT_SIDEFONTSIZE))
 end
@@ -79,6 +80,18 @@ function ArmoryUtils:InitSettings()
             end
         end
     })
+
+    if C_Item and C_Item.GetItemUpgradeInfo then
+        au_settings:AddCheckbox({
+            ["label"] = "LID_HIDEMAXUPGRADE",
+            ["search"] = "HIDEMAXUPGRADE",
+            ["value"] = ArmoryUtils:GV(AUTAB, "HIDEMAXUPGRADE", false),
+            ["func"] = function(value)
+                ArmoryUtils:SV(AUTAB, "HIDEMAXUPGRADE", value)
+                ArmoryUtils:PDUpdateItemInfos()
+            end
+        })
+    end
 
     au_settings:AddCategory({
         ["label"] = "LID_ENCHANTS",

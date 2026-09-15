@@ -2,6 +2,7 @@
 local _, ArmoryUtils = ...
 ArmoryUtils:AddTrans("ruRU", "LID_GENERAL", "Основное")
 ArmoryUtils:AddTrans("ruRU", "LID_SHOWMINIMAPBUTTON", "Показывать иконку на миникарте")
+ArmoryUtils:AddTrans("ruRU", "LID_HIDEMAXUPGRADE", "Скрывать максимальный уровень улучшения (6/6)")
 ArmoryUtils:AddTrans("ruRU", "LID_ENCHANTS", "Зачарования")
 ArmoryUtils:AddTrans("ruRU", "LID_ENCHANTONLYICON", "Только значок зачарования")
 ArmoryUtils:AddTrans("ruRU", "LID_TEXTSIZES", "Размеры текста")

@@ -2,6 +2,7 @@
 local _, ArmoryUtils = ...
 ArmoryUtils:AddTrans("itIT", "LID_GENERAL", "Generale")
 ArmoryUtils:AddTrans("itIT", "LID_SHOWMINIMAPBUTTON", "Mostra pulsante mappa mini")
+ArmoryUtils:AddTrans("itIT", "LID_HIDEMAXUPGRADE", "Nascondi livello di potenziamento massimo (6/6)")
 ArmoryUtils:AddTrans("itIT", "LID_ENCHANTS", "Incantesimi")
 ArmoryUtils:AddTrans("itIT", "LID_ENCHANTONLYICON", "Solo icona incantesimo")
 ArmoryUtils:AddTrans("itIT", "LID_TEXTSIZES", "Dimensioni del testo")
