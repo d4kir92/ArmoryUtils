@@ -5,6 +5,8 @@ ArmoryUtils:AddTrans("ruRU", "LID_SHOWMINIMAPBUTTON", "Показывать ик
 ArmoryUtils:AddTrans("ruRU", "LID_HIDEMAXUPGRADE", "Скрывать максимальный уровень улучшения (6/6)")
 ArmoryUtils:AddTrans("ruRU", "LID_WRONGARMORTYPE", "Предупреждать о неверном типе брони")
 ArmoryUtils:AddTrans("ruRU", "LID_WRONGARMORTYPETT", "Неверный тип брони: %s (доступно: %s)")
+ArmoryUtils:AddTrans("ruRU", "LID_WRONGPRIMARYSTAT", "Предупреждать о неверной основной характеристике для специализации")
+ArmoryUtils:AddTrans("ruRU", "LID_WRONGPRIMARYSTATTT", "Неверная основная характеристика: %s (нужно: %s)")
 ArmoryUtils:AddTrans("ruRU", "LID_ENCHANTS", "Зачарования")
 ArmoryUtils:AddTrans("ruRU", "LID_ENCHANTONLYICON", "Только значок зачарования")
 ArmoryUtils:AddTrans("ruRU", "LID_TEXTSIZES", "Размеры текста")

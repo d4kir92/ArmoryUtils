@@ -5,6 +5,8 @@ ArmoryUtils:AddTrans("esES", "LID_SHOWMINIMAPBUTTON", "Mostrar botón del minima
 ArmoryUtils:AddTrans("esES", "LID_HIDEMAXUPGRADE", "Ocultar nivel de mejora máximo (6/6)")
 ArmoryUtils:AddTrans("esES", "LID_WRONGARMORTYPE", "Avisar de tipo de armadura incorrecto")
 ArmoryUtils:AddTrans("esES", "LID_WRONGARMORTYPETT", "Tipo de armadura incorrecto: %s (%s posible)")
+ArmoryUtils:AddTrans("esES", "LID_WRONGPRIMARYSTAT", "Avisar de atributo principal incorrecto para la especialización")
+ArmoryUtils:AddTrans("esES", "LID_WRONGPRIMARYSTATTT", "Atributo principal incorrecto: %s (se necesita %s)")
 ArmoryUtils:AddTrans("esES", "LID_ENCHANTS", "Encantamientos")
 ArmoryUtils:AddTrans("esES", "LID_ENCHANTONLYICON", "Solo icono de encantamiento")
 ArmoryUtils:AddTrans("esES", "LID_TEXTSIZES", "Tamaños de texto")

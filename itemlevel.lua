@@ -79,6 +79,98 @@ local function GetWrongArmorText(unit, slotId, link)
     return format(ArmoryUtils:Trans("LID_WRONGARMORTYPETT"), GetArmorName(subClassID), GetArmorName(expected))
 end
 
+local STAT_STR = "ITEM_MOD_STRENGTH_SHORT"
+local STAT_AGI = "ITEM_MOD_AGILITY_SHORT"
+local STAT_INT = "ITEM_MOD_INTELLECT_SHORT"
+local AUPrimaryStatOrder = {STAT_STR, STAT_AGI, STAT_INT}
+local AUPrimaryStatKeys = {}
+if LE_UNIT_STAT_STRENGTH and LE_UNIT_STAT_AGILITY and LE_UNIT_STAT_INTELLECT then
+    AUPrimaryStatKeys[LE_UNIT_STAT_STRENGTH] = STAT_STR
+    AUPrimaryStatKeys[LE_UNIT_STAT_AGILITY] = STAT_AGI
+    AUPrimaryStatKeys[LE_UNIT_STAT_INTELLECT] = STAT_INT
+end
+
+local AUSpecPrimaryStat = {
+    [250] = STAT_STR,
+    [251] = STAT_STR,
+    [252] = STAT_STR,
+    [66] = STAT_STR,
+    [70] = STAT_STR,
+    [71] = STAT_STR,
+    [72] = STAT_STR,
+    [73] = STAT_STR,
+    [577] = STAT_AGI,
+    [581] = STAT_AGI,
+    [103] = STAT_AGI,
+    [104] = STAT_AGI,
+    [253] = STAT_AGI,
+    [254] = STAT_AGI,
+    [255] = STAT_AGI,
+    [268] = STAT_AGI,
+    [269] = STAT_AGI,
+    [259] = STAT_AGI,
+    [260] = STAT_AGI,
+    [261] = STAT_AGI,
+    [263] = STAT_AGI,
+    [1480] = STAT_INT,
+    [102] = STAT_INT,
+    [105] = STAT_INT,
+    [1467] = STAT_INT,
+    [1468] = STAT_INT,
+    [1473] = STAT_INT,
+    [62] = STAT_INT,
+    [63] = STAT_INT,
+    [64] = STAT_INT,
+    [270] = STAT_INT,
+    [65] = STAT_INT,
+    [256] = STAT_INT,
+    [257] = STAT_INT,
+    [258] = STAT_INT,
+    [262] = STAT_INT,
+    [264] = STAT_INT,
+    [265] = STAT_INT,
+    [266] = STAT_INT,
+    [267] = STAT_INT
+}
+
+local function GetSpecStatKey(unit)
+    if C_SpecializationInfo == nil then return nil end
+    if unit == "player" then
+        if C_SpecializationInfo.GetSpecialization == nil or C_SpecializationInfo.GetSpecializationInfo == nil then return nil end
+        local spec = C_SpecializationInfo.GetSpecialization()
+        if spec == nil then return nil end
+        local primaryStat = select(6, C_SpecializationInfo.GetSpecializationInfo(spec, false, false, nil, UnitSex("player")))
+        if primaryStat == nil then return nil end
+        return AUPrimaryStatKeys[primaryStat]
+    end
+
+    local getInspectSpec = C_SpecializationInfo.GetInspectSpecialization or GetInspectSpecialization
+    if getInspectSpec == nil then return nil end
+    local specID = getInspectSpec(unit)
+    if specID == nil or ArmoryUtils:IsSecret(specID) then return nil end
+    return AUSpecPrimaryStat[specID]
+end
+
+local function GetWrongStatText(unit, slotId, link)
+    if ArmoryUtils:GetWoWBuild() ~= "RETAIL" or slotId == 4 or slotId == 19 then return nil end
+    if not ArmoryUtils:DBGV("WRONGPRIMARYSTAT", true) then return nil end
+    if type(link) ~= "string" or C_Item == nil or C_Item.GetItemStats == nil then return nil end
+    local specKey = GetSpecStatKey(unit)
+    if specKey == nil then return nil end
+    local stats = C_Item.GetItemStats(link)
+    if stats == nil or stats[specKey] then return nil end
+    local itemKey = nil
+    for _, key in ipairs(AUPrimaryStatOrder) do
+        if stats[key] then
+            itemKey = key
+            break
+        end
+    end
+
+    if itemKey == nil then return nil end
+    return format(ArmoryUtils:Trans("LID_WRONGPRIMARYSTATTT"), _G[itemKey] or itemKey, _G[specKey] or specKey)
+end
+
 local slotbry = 0
 local AUCharSlots = {"AmmoSlot", "HeadSlot", "NeckSlot", "ShoulderSlot", "ShirtSlot", "ChestSlot", "WaistSlot", "LegsSlot", "FeetSlot", "WristSlot", "HandsSlot", "Finger0Slot", "Finger1Slot", "Trinket0Slot", "Trinket1Slot", "BackSlot", "MainHandSlot", "SecondaryHandSlot", "RangedSlot", "TabardSlot",}
 local AUCharSlotsLeft = {}
@@ -304,7 +396,8 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                 local Link = GetInventoryItemLink(unit, slotId) or GetInventoryItemID(unit, slotId)
                 if Link ~= nil then
                     SLOT.auarmortext = GetWrongArmorText(unit, slotId, Link)
-                    SLOT.auarmor:SetShown(SLOT.auarmortext ~= nil)
+                    SLOT.austattext = GetWrongStatText(unit, slotId, Link)
+                    SLOT.auarmor:SetShown(SLOT.auarmortext ~= nil or SLOT.austattext ~= nil)
                     local _, _, rarity, _, _, _, _, _, itemEquipLoc = ArmoryUtils:GetItemInfo(Link)
                     local ilvl = nil
                     if unit == "player" then
@@ -439,6 +532,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     SLOT.autextg:SetText("")
                     SLOT.auborder:SetVertexColor(1, 1, 1, 0)
                     SLOT.auarmortext = nil
+                    SLOT.austattext = nil
                     SLOT.auarmor:Hide()
                 end
             end
@@ -648,13 +742,14 @@ function ArmoryUtils:InitItemLevel()
         ArmoryUtils:RegisterEvent(PDThink, "SOCKET_INFO_UPDATE")
         ArmoryUtils:RegisterEvent(PDThink, "SOCKET_INFO_CLOSE")
         ArmoryUtils:RegisterEvent(PDThink, "ITEM_CHANGED")
+        ArmoryUtils:RegisterEvent(PDThink, "PLAYER_SPECIALIZATION_CHANGED", "player")
         ArmoryUtils:OnEvent(PDThink, function(sel, event, ...)
             if event == "PLAYER_EQUIPMENT_CHANGED" then
                 PDUpdateSoon(0.41, "PLAYER_EQUIPMENT_CHANGED")
             elseif event == "ENCHANT_SPELL_COMPLETED" then
                 local successful, _ = ...
                 if successful then PDUpdateSoon(0.41, "ENCHANT_SPELL_COMPLETED") end
-            elseif event == "UNIT_INVENTORY_CHANGED" or event == "ITEM_CHANGED" then
+            elseif event == "UNIT_INVENTORY_CHANGED" or event == "ITEM_CHANGED" or event == "PLAYER_SPECIALIZATION_CHANGED" then
                 PDUpdateSoon(0.41, event)
             elseif event == "SOCKET_INFO_SUCCESS" or event == "SOCKET_INFO_UPDATE" or event == "SOCKET_INFO_CLOSE" then
                 PDUpdateSoon(0.41, event)
@@ -839,8 +934,10 @@ local function AddWrongArmorLine(tt)
     if tt == nil or tt:IsForbidden() then return end
     local owner = tt:GetOwner()
     if owner == nil or (owner.IsForbidden and owner:IsForbidden()) then return end
-    if owner.auarmor == nil or owner.auarmortext == nil or not owner.auarmor:IsShown() then return end
-    tt:AddLine(owner.auarmortext, 1, 0.2, 0.2)
+    if owner.auarmor == nil or not owner.auarmor:IsShown() then return end
+    if owner.auarmortext == nil and owner.austattext == nil then return end
+    if owner.auarmortext then tt:AddLine(owner.auarmortext, 1, 0.2, 0.2) end
+    if owner.austattext then tt:AddLine(owner.austattext, 1, 0.2, 0.2) end
     tt:Show()
 end
 

@@ -5,6 +5,8 @@ ArmoryUtils:AddTrans("itIT", "LID_SHOWMINIMAPBUTTON", "Mostra pulsante mappa min
 ArmoryUtils:AddTrans("itIT", "LID_HIDEMAXUPGRADE", "Nascondi livello di potenziamento massimo (6/6)")
 ArmoryUtils:AddTrans("itIT", "LID_WRONGARMORTYPE", "Avvisa per tipo di armatura errato")
 ArmoryUtils:AddTrans("itIT", "LID_WRONGARMORTYPETT", "Tipo di armatura errato: %s (%s possibile)")
+ArmoryUtils:AddTrans("itIT", "LID_WRONGPRIMARYSTAT", "Avvisa per statistica primaria errata per la specializzazione")
+ArmoryUtils:AddTrans("itIT", "LID_WRONGPRIMARYSTATTT", "Statistica primaria errata: %s (serve %s)")
 ArmoryUtils:AddTrans("itIT", "LID_ENCHANTS", "Incantesimi")
 ArmoryUtils:AddTrans("itIT", "LID_ENCHANTONLYICON", "Solo icona incantesimo")
 ArmoryUtils:AddTrans("itIT", "LID_TEXTSIZES", "Dimensioni del testo")
