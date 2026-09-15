@@ -14,6 +14,44 @@ local AUSubClassIDs15 = {
     [6] = true
 }
 
+local AUArmorSlots = {
+    [1] = true,
+    [3] = true,
+    [5] = true,
+    [6] = true,
+    [7] = true,
+    [8] = true,
+    [9] = true,
+    [10] = true
+}
+
+local AUClassArmor = {
+    ["WARRIOR"] = 4,
+    ["PALADIN"] = 4,
+    ["DEATHKNIGHT"] = 4,
+    ["HUNTER"] = 3,
+    ["SHAMAN"] = 3,
+    ["EVOKER"] = 3,
+    ["ROGUE"] = 2,
+    ["DRUID"] = 2,
+    ["MONK"] = 2,
+    ["DEMONHUNTER"] = 2,
+    ["PRIEST"] = 1,
+    ["MAGE"] = 1,
+    ["WARLOCK"] = 1
+}
+
+local function IsWrongArmor(unit, slotId, link)
+    if ArmoryUtils:GetWoWBuild() ~= "RETAIL" or not AUArmorSlots[slotId] then return false end
+    if not ArmoryUtils:DBGV("WRONGARMORTYPE", true) then return false end
+    local _, classFile = UnitClass(unit)
+    if classFile == nil or ArmoryUtils:IsSecret(classFile) then return false end
+    local expected = AUClassArmor[classFile]
+    if expected == nil then return false end
+    local _, _, _, _, _, classID, subClassID = C_Item.GetItemInfoInstant(link)
+    return classID == 4 and subClassID ~= nil and subClassID >= 1 and subClassID < expected
+end
+
 local slotbry = 0
 local AUCharSlots = {"AmmoSlot", "HeadSlot", "NeckSlot", "ShoulderSlot", "ShirtSlot", "ChestSlot", "WaistSlot", "LegsSlot", "FeetSlot", "WristSlot", "HandsSlot", "Finger0Slot", "Finger1Slot", "Trinket0Slot", "Trinket1Slot", "BackSlot", "MainHandSlot", "SecondaryHandSlot", "RangedSlot", "TabardSlot",}
 local AUCharSlotsLeft = {}
@@ -129,6 +167,12 @@ function ArmoryUtils:AddIlvl(prefix, SLOT, i)
         end
 
         SLOT.auborder:SetPoint("CENTER")
+        SLOT.auarmor = SLOT.auinfo:CreateTexture("SLOT.auarmor", "OVERLAY")
+        SLOT.auarmor:SetTexture("Interface\\DialogFrame\\UI-Dialog-Icon-AlertNew")
+        SLOT.auarmor:SetVertexColor(1, 0.2, 0.2, 1)
+        SLOT.auarmor:SetSize(14, 14)
+        SLOT.auarmor:SetPoint("TOPRIGHT", SLOT.auinfo, "TOPRIGHT", 3, 3)
+        SLOT.auarmor:Hide()
     end
 end
 
@@ -232,6 +276,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                 local slotId = SLOT:GetID()
                 local Link = GetInventoryItemLink(unit, slotId) or GetInventoryItemID(unit, slotId)
                 if Link ~= nil then
+                    SLOT.auarmor:SetShown(IsWrongArmor(unit, slotId, Link))
                     local _, _, rarity, _, _, _, _, _, itemEquipLoc = ArmoryUtils:GetItemInfo(Link)
                     local ilvl = nil
                     if unit == "player" then
@@ -365,6 +410,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     SLOT.autexte:SetText("")
                     SLOT.autextg:SetText("")
                     SLOT.auborder:SetVertexColor(1, 1, 1, 0)
+                    SLOT.auarmor:Hide()
                 end
             end
         end

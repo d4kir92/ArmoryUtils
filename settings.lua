@@ -16,6 +16,7 @@ local function ApplyDefaults()
     ArmoryUtils:SV(AUTAB, "SHOWITEMLEVEL", ArmoryUtils:GV(AUTAB, "SHOWITEMLEVEL", true))
     ArmoryUtils:SV(AUTAB, "ENCHANTONLYICON", ArmoryUtils:GV(AUTAB, "ENCHANTONLYICON", true))
     ArmoryUtils:SV(AUTAB, "HIDEMAXUPGRADE", ArmoryUtils:GV(AUTAB, "HIDEMAXUPGRADE", false))
+    ArmoryUtils:SV(AUTAB, "WRONGARMORTYPE", ArmoryUtils:GV(AUTAB, "WRONGARMORTYPE", true))
     ArmoryUtils:SV(AUTAB, "ILVLFONTSIZE", ArmoryUtils:GV(AUTAB, "ILVLFONTSIZE", DEFAULT_ILVLFONTSIZE))
     ArmoryUtils:SV(AUTAB, "SIDEFONTSIZE", ArmoryUtils:GV(AUTAB, "SIDEFONTSIZE", DEFAULT_SIDEFONTSIZE))
 end
@@ -89,6 +90,19 @@ function ArmoryUtils:InitSettings()
             ["func"] = function(value)
                 ArmoryUtils:SV(AUTAB, "HIDEMAXUPGRADE", value)
                 ArmoryUtils:PDUpdateItemInfos()
+            end
+        })
+    end
+
+    if ArmoryUtils:GetWoWBuild() == "RETAIL" then
+        au_settings:AddCheckbox({
+            ["label"] = "LID_WRONGARMORTYPE",
+            ["search"] = "WRONGARMORTYPE",
+            ["value"] = ArmoryUtils:GV(AUTAB, "WRONGARMORTYPE", true),
+            ["func"] = function(value)
+                ArmoryUtils:SV(AUTAB, "WRONGARMORTYPE", value)
+                ArmoryUtils:PDUpdateItemInfos()
+                if InspectFrame and InspectFrame:IsShown() then ArmoryUtils:IFUpdateItemInfos() end
             end
         })
     end

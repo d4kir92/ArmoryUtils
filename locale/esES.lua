@@ -3,6 +3,7 @@ local _, ArmoryUtils = ...
 ArmoryUtils:AddTrans("esES", "LID_GENERAL", "General")
 ArmoryUtils:AddTrans("esES", "LID_SHOWMINIMAPBUTTON", "Mostrar botón del minimapa")
 ArmoryUtils:AddTrans("esES", "LID_HIDEMAXUPGRADE", "Ocultar nivel de mejora máximo (6/6)")
+ArmoryUtils:AddTrans("esES", "LID_WRONGARMORTYPE", "Avisar de tipo de armadura incorrecto")
 ArmoryUtils:AddTrans("esES", "LID_ENCHANTS", "Encantamientos")
 ArmoryUtils:AddTrans("esES", "LID_ENCHANTONLYICON", "Solo icono de encantamiento")
 ArmoryUtils:AddTrans("esES", "LID_TEXTSIZES", "Tamaños de texto")

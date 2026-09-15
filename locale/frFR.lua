@@ -3,6 +3,7 @@ local _, ArmoryUtils = ...
 ArmoryUtils:AddTrans("frFR", "LID_GENERAL", "Général")
 ArmoryUtils:AddTrans("frFR", "LID_SHOWMINIMAPBUTTON", "Afficher le bouton de la minicarte")
 ArmoryUtils:AddTrans("frFR", "LID_HIDEMAXUPGRADE", "Masquer le niveau d'amélioration maximal (6/6)")
+ArmoryUtils:AddTrans("frFR", "LID_WRONGARMORTYPE", "Avertir en cas de mauvais type d'armure")
 ArmoryUtils:AddTrans("frFR", "LID_ENCHANTS", "Enchantements")
 ArmoryUtils:AddTrans("frFR", "LID_ENCHANTONLYICON", "Icône d'enchantement uniquement")
 ArmoryUtils:AddTrans("frFR", "LID_TEXTSIZES", "Tailles de texte")

@@ -3,6 +3,7 @@ local _, ArmoryUtils = ...
 ArmoryUtils:AddTrans("deDE", "LID_GENERAL", "Allgemein")
 ArmoryUtils:AddTrans("deDE", "LID_SHOWMINIMAPBUTTON", "Minimapknopf anzeigen")
 ArmoryUtils:AddTrans("deDE", "LID_HIDEMAXUPGRADE", "Maximale Aufwertungsstufe ausblenden (6/6)")
+ArmoryUtils:AddTrans("deDE", "LID_WRONGARMORTYPE", "Vor falschem Rüstungstyp warnen")
 ArmoryUtils:AddTrans("deDE", "LID_ENCHANTS", "Verzauberungen")
 ArmoryUtils:AddTrans("deDE", "LID_ENCHANTONLYICON", "Verzauberung nur Symbol")
 ArmoryUtils:AddTrans("deDE", "LID_TEXTSIZES", "Textgrößen")
