@@ -94,18 +94,16 @@ function ArmoryUtils:InitSettings()
         })
     end
 
-    if ArmoryUtils:GetWoWBuild() == "RETAIL" then
-        au_settings:AddCheckbox({
-            ["label"] = "LID_WRONGARMORTYPE",
-            ["search"] = "WRONGARMORTYPE",
-            ["value"] = ArmoryUtils:GV(AUTAB, "WRONGARMORTYPE", true),
-            ["func"] = function(value)
-                ArmoryUtils:SV(AUTAB, "WRONGARMORTYPE", value)
-                ArmoryUtils:PDUpdateItemInfos()
-                if InspectFrame and InspectFrame:IsShown() then ArmoryUtils:IFUpdateItemInfos() end
-            end
-        })
-    end
+    au_settings:AddCheckbox({
+        ["label"] = "LID_WRONGARMORTYPE",
+        ["search"] = "WRONGARMORTYPE",
+        ["value"] = ArmoryUtils:GV(AUTAB, "WRONGARMORTYPE", true),
+        ["func"] = function(value)
+            ArmoryUtils:SV(AUTAB, "WRONGARMORTYPE", value)
+            ArmoryUtils:PDUpdateItemInfos()
+            if InspectFrame and InspectFrame:IsShown() then ArmoryUtils:IFUpdateItemInfos() end
+        end
+    })
 
     au_settings:AddCategory({
         ["label"] = "LID_ENCHANTS",

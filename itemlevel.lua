@@ -41,15 +41,42 @@ local AUClassArmor = {
     ["WARLOCK"] = 1
 }
 
-local function IsWrongArmor(unit, slotId, link)
-    if ArmoryUtils:GetWoWBuild() ~= "RETAIL" or not AUArmorSlots[slotId] then return false end
-    if not ArmoryUtils:DBGV("WRONGARMORTYPE", true) then return false end
-    local _, classFile = UnitClass(unit)
-    if classFile == nil or ArmoryUtils:IsSecret(classFile) then return false end
+local AUClassArmorBelow40 = {
+    ["WARRIOR"] = 3,
+    ["PALADIN"] = 3,
+    ["HUNTER"] = 2,
+    ["SHAMAN"] = 2
+}
+
+local function GetExpectedArmor(unit, classFile)
     local expected = AUClassArmor[classFile]
-    if expected == nil then return false end
-    local _, _, _, _, _, classID, subClassID = C_Item.GetItemInfoInstant(link)
-    return classID == 4 and subClassID ~= nil and subClassID >= 1 and subClassID < expected
+    if expected == nil or ArmoryUtils:GetWoWBuild() == "RETAIL" then return expected end
+    local below40 = AUClassArmorBelow40[classFile]
+    if below40 == nil then return expected end
+    local level = UnitLevel(unit)
+    if level == nil or ArmoryUtils:IsSecret(level) then return nil end
+    if level > 0 and level < 40 then return below40 end
+    return expected
+end
+
+local function GetArmorName(subClassID)
+    local getInfo = C_Item and C_Item.GetItemSubClassInfo or GetItemSubClassInfo
+    if getInfo == nil then return tostring(subClassID) end
+    return getInfo(4, subClassID) or tostring(subClassID)
+end
+
+local function GetWrongArmorText(unit, slotId, link)
+    if not AUArmorSlots[slotId] then return nil end
+    if not ArmoryUtils:DBGV("WRONGARMORTYPE", true) then return nil end
+    local _, classFile = UnitClass(unit)
+    if classFile == nil or ArmoryUtils:IsSecret(classFile) then return nil end
+    local expected = GetExpectedArmor(unit, classFile)
+    if expected == nil then return nil end
+    local getInstant = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
+    if getInstant == nil then return nil end
+    local _, _, _, _, _, classID, subClassID = getInstant(link)
+    if classID ~= 4 or subClassID == nil or subClassID < 1 or subClassID >= expected then return nil end
+    return format(ArmoryUtils:Trans("LID_WRONGARMORTYPETT"), GetArmorName(subClassID), GetArmorName(expected))
 end
 
 local slotbry = 0
@@ -276,7 +303,8 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                 local slotId = SLOT:GetID()
                 local Link = GetInventoryItemLink(unit, slotId) or GetInventoryItemID(unit, slotId)
                 if Link ~= nil then
-                    SLOT.auarmor:SetShown(IsWrongArmor(unit, slotId, Link))
+                    SLOT.auarmortext = GetWrongArmorText(unit, slotId, Link)
+                    SLOT.auarmor:SetShown(SLOT.auarmortext ~= nil)
                     local _, _, rarity, _, _, _, _, _, itemEquipLoc = ArmoryUtils:GetItemInfo(Link)
                     local ilvl = nil
                     if unit == "player" then
@@ -410,6 +438,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     SLOT.autexte:SetText("")
                     SLOT.autextg:SetText("")
                     SLOT.auborder:SetVertexColor(1, 1, 1, 0)
+                    SLOT.auarmortext = nil
                     SLOT.auarmor:Hide()
                 end
             end
@@ -804,4 +833,19 @@ if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetUnit") then
             end
         end)
     end)
+end
+
+local function AddWrongArmorLine(tt)
+    if tt == nil or tt:IsForbidden() then return end
+    local owner = tt:GetOwner()
+    if owner == nil or (owner.IsForbidden and owner:IsForbidden()) then return end
+    if owner.auarmor == nil or owner.auarmortext == nil or not owner.auarmor:IsShown() then return end
+    tt:AddLine(owner.auarmortext, 1, 0.2, 0.2)
+    tt:Show()
+end
+
+if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tt, data) AddWrongArmorLine(tt) end)
+elseif GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetItem") then
+    GameTooltip:HookScript("OnTooltipSetItem", function(tt) AddWrongArmorLine(tt) end)
 end
