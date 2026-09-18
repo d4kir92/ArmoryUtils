@@ -106,7 +106,7 @@ function ArmoryUtils:InitSettings()
         end
     })
 
-    if ArmoryUtils:GetWoWBuild() == "RETAIL" then
+    if ArmoryUtils:GetWoWBuild() == "RETAIL" and not ArmoryUtils:IsCamelot() then
         au_settings:AddCheckbox({
             ["label"] = "LID_WRONGPRIMARYSTAT",
             ["search"] = "WRONGPRIMARYSTAT",

@@ -152,7 +152,7 @@ local function GetSpecStatKey(unit)
 end
 
 local function GetWrongStatText(unit, slotId, link)
-    if ArmoryUtils:GetWoWBuild() ~= "RETAIL" or slotId == 4 or slotId == 19 then return nil end
+    if ArmoryUtils:GetWoWBuild() ~= "RETAIL" or ArmoryUtils:IsCamelot() or slotId == 4 or slotId == 19 then return nil end
     if not ArmoryUtils:DBGV("WRONGPRIMARYSTAT", true) then return nil end
     if type(link) ~= "string" or C_Item == nil or C_Item.GetItemStats == nil then return nil end
     local specKey = GetSpecStatKey(unit)
@@ -558,10 +558,10 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             frame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
             if _G[prefix .. "NameFrame"] then
                 local nameFrame = _G[prefix .. "NameFrame"]
-                frame.ilvl:SetPoint("BOTTOM", nameFrame, "TOP", 0, 8)
+                frame.ilvl:SetPoint("BOTTOM", nameFrame, "TOP", 0, 22)
             elseif _G[prefix .. "Frame"] and _G[prefix .. "Frame"].TitleContainer then
                 local titleContainer = _G[prefix .. "Frame"].TitleContainer
-                frame.ilvl:SetPoint("BOTTOM", titleContainer, "TOP", 0, 0)
+                frame.ilvl:SetPoint("BOTTOM", titleContainer, "TOP", 0, 21)
             end
 
             frame.ilvl:SetText("")
