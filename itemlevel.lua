@@ -350,6 +350,20 @@ enchantSlots["RETAIL"][11] = true
 enchantSlots["RETAIL"][12] = true
 enchantSlots["RETAIL"][16] = true
 enchantSlots["RETAIL"][17] = true
+enchantSlots["CAMELOT"] = {}
+enchantSlots["CAMELOT"][2] = true
+enchantSlots["CAMELOT"][5] = true
+enchantSlots["CAMELOT"][8] = true
+enchantSlots["CAMELOT"][9] = true
+enchantSlots["CAMELOT"][10] = true
+enchantSlots["CAMELOT"][15] = true
+enchantSlots["CAMELOT"][16] = true
+enchantSlots["CAMELOT"][17] = true
+local function GetEnchantSlots()
+    if ArmoryUtils:IsCamelot() then return enchantSlots["CAMELOT"] end
+    return enchantSlots[ArmoryUtils:GetWoWBuild()]
+end
+
 function ArmoryUtils:IsOffhandAWeapon(unit, slotId)
     local itemID = GetInventoryItemID(unit, slotId)
     if not itemID then return false end
@@ -466,8 +480,9 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                         end
 
                         if not foundEnchant then
-                            if enchantSlots[ArmoryUtils:GetWoWBuild()] then
-                                if SLOT:GetID() and (SLOT:GetID() ~= 17 or ArmoryUtils:IsOffhandAWeapon(unit, 17)) and enchantSlots[ArmoryUtils:GetWoWBuild()][SLOT:GetID()] then
+                            local slots = GetEnchantSlots()
+                            if slots then
+                                if SLOT:GetID() and (SLOT:GetID() ~= 17 or ArmoryUtils:IsCamelot() or ArmoryUtils:IsOffhandAWeapon(unit, 17)) and slots[SLOT:GetID()] then
                                     SLOT.autexte:SetText("|T130775:0:0:0:0|t")
                                 else
                                     SLOT.autexte:SetText("")
