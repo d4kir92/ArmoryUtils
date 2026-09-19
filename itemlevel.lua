@@ -554,16 +554,26 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
         end
 
         if frame.ilvl == nil and ArmoryUtils:GetName(frame) then
-            frame.ilvl = frame:CreateFontString("ArmoryUtils.ilvl", "OVERLAY")
-            frame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
-            if _G[prefix .. "NameFrame"] then
-                local nameFrame = _G[prefix .. "NameFrame"]
-                frame.ilvl:SetPoint("BOTTOM", nameFrame, "TOP", 0, 22)
-            elseif _G[prefix .. "Frame"] and _G[prefix .. "Frame"].TitleContainer then
-                local titleContainer = _G[prefix .. "Frame"].TitleContainer
-                frame.ilvl:SetPoint("BOTTOM", titleContainer, "TOP", 0, 21)
+            local mainFrame = _G[prefix .. "Frame"] or frame
+            local anchor = _G[prefix .. "NameFrame"]
+            local offset = 22
+            if anchor == nil and mainFrame.TitleContainer then
+                anchor = mainFrame.TitleContainer
+                offset = 21
             end
 
+            if anchor == nil then
+                anchor = mainFrame
+                offset = 4
+            end
+
+            local holder = CreateFrame("FRAME", nil, anchor)
+            holder:SetSize(1, 1)
+            holder:SetFrameLevel(anchor:GetFrameLevel() + 10)
+            holder:SetPoint("BOTTOM", anchor, "TOP", 0, offset)
+            frame.ilvl = holder:CreateFontString("ArmoryUtils.ilvl", "OVERLAY")
+            frame.ilvl:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
+            frame.ilvl:SetPoint("BOTTOM", holder, "BOTTOM", 0, 0)
             frame.ilvl:SetText("")
         end
 
