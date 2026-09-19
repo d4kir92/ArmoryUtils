@@ -554,7 +554,13 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             end
         end
 
-        if frame.ilvl == nil and ArmoryUtils:GetName(frame) then
+        local statsPaneValue = nil
+        if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value then
+            statsPaneValue = CharacterStatsPane.ItemLevelFrame.Value
+            if frame.ilvl then frame.ilvl:SetText("") end
+        end
+
+        if statsPaneValue == nil and frame.ilvl == nil and ArmoryUtils:GetName(frame) then
             local mainFrame = _G[prefix .. "Frame"] or frame
             local anchor = _G[prefix .. "NameFrame"]
             local offset = 22
@@ -582,34 +588,30 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             local max = 17
             if ArmoryUtils:GetWoWBuild() == "RETAIL" then max = 16 end
             AUILVL = string.format("%0.2f", sum / max)
-            if frame.ilvl then
-                if ArmoryUtils:GetAUILVL() then
-                    if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value then
-                        if characterIlvlHooked == false then
-                            characterIlvlHooked = true
-                            local setText = false
-                            hooksecurefunc(CharacterStatsPane.ItemLevelFrame.Value, "SetText", function(sel)
-                                if setText then return end
-                                setText = true
-                                sel:SetText(ArmoryUtils:GetAUILVL())
-                                setText = false
-                            end)
-                        end
-
-                        CharacterStatsPane.ItemLevelFrame.Value:SetText(ArmoryUtils:GetAUILVL())
-                    else
-                        frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
+            if ArmoryUtils:GetAUILVL() then
+                if statsPaneValue then
+                    if characterIlvlHooked == false then
+                        characterIlvlHooked = true
+                        local setText = false
+                        hooksecurefunc(statsPaneValue, "SetText", function(sel)
+                            if setText then return end
+                            setText = true
+                            sel:SetText(ArmoryUtils:GetAUILVL())
+                            setText = false
+                        end)
                     end
-                end
 
-                if unit ~= "player" then lastInspectGUID = nil end
+                    statsPaneValue:SetText(ArmoryUtils:GetAUILVL())
+                elseif frame.ilvl then
+                    frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
+                end
             end
+
+            if unit ~= "player" then lastInspectGUID = nil end
+        elseif statsPaneValue then
+            if ArmoryUtils:GetAUILVL() then statsPaneValue:SetText(ArmoryUtils:GetAUILVL()) end
         elseif frame.ilvl then
-            if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value and ArmoryUtils:GetAUILVL() then
-                CharacterStatsPane.ItemLevelFrame.Value:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
-            else
-                frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
-            end
+            frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
         end
     end
 end
