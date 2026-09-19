@@ -50,7 +50,8 @@ local AUClassArmorBelow40 = {
 
 local function GetExpectedArmor(unit, classFile)
     local expected = AUClassArmor[classFile]
-    if expected == nil or ArmoryUtils:GetWoWBuild() == "RETAIL" then return expected end
+    if expected == nil then return nil end
+    if ArmoryUtils:GetWoWBuild() == "RETAIL" and not ArmoryUtils:IsCamelot() then return expected end
     local below40 = AUClassArmorBelow40[classFile]
     if below40 == nil then return expected end
     local level = UnitLevel(unit)
