@@ -1,6 +1,6 @@
 local _, ArmoryUtils = ...
 local ICON = 134952
-local VERSION = "1.3.5"
+local VERSION = "1.3.6"
 local DEFAULT_WIDTH = 460
 local DEFAULT_HEIGHT = 520
 local DEFAULT_ILVLFONTSIZE = 11
