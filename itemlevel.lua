@@ -51,7 +51,7 @@ local AUClassArmorBelow40 = {
 local function GetExpectedArmor(unit, classFile)
     local expected = AUClassArmor[classFile]
     if expected == nil then return nil end
-    if ArmoryUtils:GetWoWBuild() == "RETAIL" and not ArmoryUtils:IsCamelot() then return expected end
+    if ArmoryUtils:GetWoWBuild() == "RETAIL" and not ArmoryUtils:IsForever() then return expected end
     local below40 = AUClassArmorBelow40[classFile]
     if below40 == nil then return expected end
     local level = UnitLevel(unit)
@@ -153,7 +153,7 @@ local function GetSpecStatKey(unit)
 end
 
 local function GetWrongStatText(unit, slotId, link)
-    if ArmoryUtils:GetWoWBuild() ~= "RETAIL" or ArmoryUtils:IsCamelot() or slotId == 4 or slotId == 19 then return nil end
+    if ArmoryUtils:GetWoWBuild() ~= "RETAIL" or ArmoryUtils:IsForever() or slotId == 4 or slotId == 19 then return nil end
     if not ArmoryUtils:DBGV("WRONGPRIMARYSTAT", true) then return nil end
     if type(link) ~= "string" or C_Item == nil or C_Item.GetItemStats == nil then return nil end
     local specKey = GetSpecStatKey(unit)
@@ -361,7 +361,7 @@ enchantSlots["CAMELOT"][15] = true
 enchantSlots["CAMELOT"][16] = true
 enchantSlots["CAMELOT"][17] = true
 local function GetEnchantSlots()
-    if ArmoryUtils:IsCamelot() then return enchantSlots["CAMELOT"] end
+    if ArmoryUtils:IsForever() then return enchantSlots["CAMELOT"] end
     return enchantSlots[ArmoryUtils:GetWoWBuild()]
 end
 
@@ -483,7 +483,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                         if not foundEnchant then
                             local slots = GetEnchantSlots()
                             if slots then
-                                if SLOT:GetID() and (SLOT:GetID() ~= 17 or ArmoryUtils:IsCamelot() or ArmoryUtils:IsOffhandAWeapon(unit, 17)) and slots[SLOT:GetID()] then
+                                if SLOT:GetID() and (SLOT:GetID() ~= 17 or ArmoryUtils:IsForever() or ArmoryUtils:IsOffhandAWeapon(unit, 17)) and slots[SLOT:GetID()] then
                                     SLOT.autexte:SetText("|T130775:0:0:0:0|t")
                                 else
                                     SLOT.autexte:SetText("")
