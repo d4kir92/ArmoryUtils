@@ -555,7 +555,8 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
         end
 
         local statsPaneValue = nil
-        if prefix == "Character" and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value then
+        local statsPaneActive = CharacterFrame == nil or CharacterFrame.GetStatsPane == nil or CharacterFrame:GetStatsPane() == CharacterStatsPane
+        if prefix == "Character" and statsPaneActive and CharacterStatsPane and CharacterStatsPane.ItemLevelFrame and CharacterStatsPane.ItemLevelFrame.Value then
             statsPaneValue = CharacterStatsPane.ItemLevelFrame.Value
             if frame.ilvl then frame.ilvl:SetText("") end
         end
@@ -566,7 +567,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             local offset = 22
             if anchor == nil and mainFrame.TitleContainer then
                 anchor = mainFrame.TitleContainer
-                offset = 21
+                offset = 11
             end
 
             if anchor == nil then
