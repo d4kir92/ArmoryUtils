@@ -970,8 +970,8 @@ local function AddWrongArmorLine(tt)
     tt:Show()
 end
 
-if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tt, data) AddWrongArmorLine(tt) end)
-elseif GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetItem") then
+if GameTooltip.HasScript and GameTooltip:HasScript("OnTooltipSetItem") then
     GameTooltip:HookScript("OnTooltipSetItem", function(tt) AddWrongArmorLine(tt) end)
+elseif TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tt, data) AddWrongArmorLine(tt) end)
 end
