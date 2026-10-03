@@ -690,6 +690,57 @@ function ArmoryUtils:UpdateBagItem(bagID, size, SLOT, i)
     end
 end
 
+function ArmoryUtils:UpdateEquipmentFlyout()
+    local flyout = EquipmentFlyoutFrame
+    if not flyout or not flyout.button or not flyout.buttons then return end
+    local settings = flyout.button:GetParent().flyoutSettings
+    for _, button in ipairs(flyout.buttons) do
+        if button:IsShown() then
+            ArmoryUtils:AddIlvl(nil, button, button.id)
+            button.auinfo:SetFrameLevel(button:GetFrameLevel() + 10)
+            button.autext:SetText("")
+            button.auborder:SetVertexColor(1, 1, 1, 0)
+            local link
+            local location = button.location
+            if settings and settings.useItemLocation then
+                if location and location:IsValid() and C_Item and C_Item.GetItemLink then link = C_Item.GetItemLink(location) end
+            elseif type(location) == "number" and location >= 0 and (not EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION or location < EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION) then
+                local bags, slot, bag
+                if EquipmentManager_GetLocationData then
+                    local data = EquipmentManager_GetLocationData(location)
+                    bags, slot, bag = data.isBags, data.slot, data.bag
+                elseif EquipmentManager_UnpackLocation then
+                    local data = {EquipmentManager_UnpackLocation(location)}
+                    bags = data[3]
+                    if type(data[4]) == "boolean" then
+                        if not data[4] then slot, bag = data[5], data[6] end
+                    else
+                        slot, bag = data[4], data[5]
+                    end
+                end
+                if slot then
+                    if bags then
+                        link = ArmoryUtils:GetContainerItemLink(bag, slot)
+                    else
+                        link = GetInventoryItemLink("player", slot)
+                    end
+                end
+            end
+            if link and ArmoryUtils:DBGV("ITEMLEVEL", true) then
+                local _, _, rarity = ArmoryUtils:GetItemInfo(link)
+                local level = ArmoryUtils:GetDetailedItemLevelInfo(link)
+                local color = rarity and ITEM_QUALITY_COLORS[rarity]
+                if color then
+                    if level and level > 1 and ArmoryUtils:DBGV("ITEMLEVELNUMBER", true) and not ArmoryUtils:IsAddOnLoaded("DejaCharacterStats") then button.autext:SetText(color.hex .. level) end
+                    if rarity > 1 and ArmoryUtils:DBGV("ITEMLEVELBORDER", true) then
+                        button.auborder:SetVertexColor(color.r, color.g, color.b, AUGlowAlpha)
+                    end
+                end
+            end
+        end
+    end
+end
+
 function ArmoryUtils:UpdateBag(bag, id)
     local name = ArmoryUtils:GetName(bag)
     local bagID = bag:GetID()
@@ -753,6 +804,14 @@ function ArmoryUtils:InitItemLevel()
         end
 
         if PaperDollFrame then PaperDollFrame:HookScript("OnShow", function() ArmoryUtils:After(0.33, function() ArmoryUtils:PDUpdateItemInfos() end, "PaperDollFrameOnShow") end) end
+        if EquipmentFlyout_UpdateItems then
+            hooksecurefunc("EquipmentFlyout_UpdateItems", function() ArmoryUtils:UpdateEquipmentFlyout() end)
+            local flyoutEvents = CreateFrame("FRAME")
+            ArmoryUtils:RegisterEvent(flyoutEvents, "GET_ITEM_INFO_RECEIVED")
+            ArmoryUtils:OnEvent(flyoutEvents, function()
+                if EquipmentFlyoutFrame and EquipmentFlyoutFrame:IsShown() then ArmoryUtils:UpdateEquipmentFlyout() end
+            end, "EquipmentFlyoutItemInfo")
+        end
         local pdUpdatePending = false
         local function PDUpdateSoon(delay, from)
             if pdUpdatePending then return end
