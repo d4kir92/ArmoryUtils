@@ -1,6 +1,6 @@
 local _, ArmoryUtils = ...
 local ICON = 134952
-local VERSION = "1.3.13"
+local VERSION = "1.3.14"
 local DEFAULT_WIDTH = 460
 local DEFAULT_HEIGHT = 520
 local DEFAULT_ILVLFONTSIZE = 11
@@ -48,6 +48,7 @@ function ArmoryUtils:InitSettings()
     ApplyDefaults()
     au_settings = ArmoryUtils:CreateUIWindow({
         ["name"] = "ArmoryUtilsSettings",
+        ["escClose"] = false,
         ["pTab"] = {"CENTER"},
         ["width"] = ArmoryUtils:GV(AUTAB, "WINDOWWIDTH", DEFAULT_WIDTH),
         ["height"] = ArmoryUtils:GV(AUTAB, "WINDOWHEIGHT", DEFAULT_HEIGHT),
@@ -62,6 +63,15 @@ function ArmoryUtils:InitSettings()
         ["title"] = format("|T%d:16:16:0:0|t ArmoryUtils v%s", ICON, ArmoryUtils:GetVersion())
     })
 
+    au_settings:EnableKeyboard(true)
+    au_settings:SetPropagateKeyboardInput(true)
+    au_settings:SetScript("OnKeyDown", function(window, key)
+        if not InCombatLockdown() then window:SetPropagateKeyboardInput(key ~= "ESCAPE") end
+        if key == "ESCAPE" then window:Hide() end
+    end)
+
+    au_settings:RegisterEvent("PLAYER_ENTERING_WORLD")
+    au_settings:HookScript("OnEvent", function(window, event) if event == "PLAYER_ENTERING_WORLD" then window:Hide() end end)
     au_settings:SuspendLayout()
     au_settings:AddSearch()
     au_settings:AddCategory({
