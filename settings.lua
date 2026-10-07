@@ -1,6 +1,6 @@
 local _, ArmoryUtils = ...
 local ICON = 134952
-local VERSION = "1.3.14"
+local VERSION = "1.3.15"
 local DEFAULT_WIDTH = 460
 local DEFAULT_HEIGHT = 520
 local DEFAULT_ILVLFONTSIZE = 11
@@ -32,7 +32,10 @@ function ArmoryUtils:SetLanguage(lang)
     AUTAB["LANGUAGE"] = lang ~= GetLocale() and lang or nil
     if ArmoryUtils.UpdateItemLevelCategory then ArmoryUtils:UpdateItemLevelCategory() end
     if not au_settings then return end
-    for _, refresh in ipairs(au_settings.languageRefresh) do refresh() end
+    for _, refresh in ipairs(au_settings.languageRefresh) do
+        refresh()
+    end
+
     au_settings.Language:SetText(ArmoryUtils:GetLanguageName())
     au_settings.search.Hint:SetText(ArmoryUtils:Trans("LID_SEARCH"))
     au_settings:Filter(au_settings.search:GetText())
@@ -54,8 +57,10 @@ local function AddLanguageSelector(window)
                 else
                     widget.Label:SetText(text)
                 end
+
                 ArmoryUtils.UI:SetLabel(element, text)
             end
+
             if method == "AddSlider" then widget.slider:HookScript("OnValueChanged", Refresh) end
             table.insert(self.languageRefresh, Refresh)
             return widget
@@ -94,18 +99,23 @@ local function AddLanguageSelector(window)
                 for i, info in ipairs(ArmoryUtils.LANGUAGES) do
                     if info[2] == ArmoryUtils:GetLanguage() then current = i end
                 end
+
                 ArmoryUtils:SetLanguage(ArmoryUtils.LANGUAGES[current % #ArmoryUtils.LANGUAGES + 1][2])
             end
         end)
+
         window.Language:SetScript("OnEnter", function(button)
             GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
             GameTooltip:SetText(ArmoryUtils:Trans("LID_LANGUAGE"))
             GameTooltip:Show()
         end)
+
         window.Language:SetScript("OnLeave", function() GameTooltip:Hide() end)
     end
+
     window.Language:SetText(ArmoryUtils:GetLanguageName())
 end
+
 local function ShowMinimapButtonDefault()
     return ArmoryUtils:GetWoWBuild() ~= "RETAIL"
 end
@@ -174,7 +184,10 @@ function ArmoryUtils:InitSettings()
     au_settings:RegisterEvent("PLAYER_ENTERING_WORLD")
     au_settings:HookScript("OnEvent", function(window, event) if event == "PLAYER_ENTERING_WORLD" then window:Hide() end end)
     au_settings:SuspendLayout()
-    au_settings:AddSearch({["label"] = ArmoryUtils:Trans("LID_SEARCH")})
+    au_settings:AddSearch({
+        ["label"] = ArmoryUtils:Trans("LID_SEARCH")
+    })
+
     au_settings:AddCategory({
         ["label"] = "LID_GENERAL",
         ["key"] = "GENERAL"
