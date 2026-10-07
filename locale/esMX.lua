@@ -14,3 +14,4 @@ ArmoryUtils:AddTrans("esMX", "LID_ILVLFONTSIZE", "Tamaño del texto de nivel de 
 ArmoryUtils:AddTrans("esMX", "LID_SIDEFONTSIZE", "Tamaño de los textos laterales: %s")
 ArmoryUtils:AddTrans("esMX", "LID_TOOLTIP", "Información")
 ArmoryUtils:AddTrans("esMX", "LID_SHOWITEMLEVEL", "Mostrar nivel de objeto")
+ArmoryUtils:AddTrans("esMX", "LID_LANGUAGE", "Idioma / Language")

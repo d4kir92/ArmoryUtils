@@ -14,3 +14,4 @@ ArmoryUtils:AddTrans("itIT", "LID_ILVLFONTSIZE", "Dimensione testo livello ogget
 ArmoryUtils:AddTrans("itIT", "LID_SIDEFONTSIZE", "Dimensione testi laterali: %s")
 ArmoryUtils:AddTrans("itIT", "LID_TOOLTIP", "Descrizione")
 ArmoryUtils:AddTrans("itIT", "LID_SHOWITEMLEVEL", "Mostra livello oggetto")
+ArmoryUtils:AddTrans("itIT", "LID_LANGUAGE", "Lingua / Language")

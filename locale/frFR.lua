@@ -14,3 +14,4 @@ ArmoryUtils:AddTrans("frFR", "LID_ILVLFONTSIZE", "Taille du texte du niveau d'ob
 ArmoryUtils:AddTrans("frFR", "LID_SIDEFONTSIZE", "Taille des textes latéraux : %s")
 ArmoryUtils:AddTrans("frFR", "LID_TOOLTIP", "Infobulle")
 ArmoryUtils:AddTrans("frFR", "LID_SHOWITEMLEVEL", "Afficher le niveau d'objet")
+ArmoryUtils:AddTrans("frFR", "LID_LANGUAGE", "Langue / Language")

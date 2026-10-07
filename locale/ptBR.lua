@@ -14,3 +14,4 @@ ArmoryUtils:AddTrans("ptBR", "LID_ILVLFONTSIZE", "Tamanho do texto do nível de 
 ArmoryUtils:AddTrans("ptBR", "LID_SIDEFONTSIZE", "Tamanho dos textos laterais: %s")
 ArmoryUtils:AddTrans("ptBR", "LID_TOOLTIP", "Dica de ferramenta")
 ArmoryUtils:AddTrans("ptBR", "LID_SHOWITEMLEVEL", "Mostrar nível de item")
+ArmoryUtils:AddTrans("ptBR", "LID_LANGUAGE", "Idioma / Language")

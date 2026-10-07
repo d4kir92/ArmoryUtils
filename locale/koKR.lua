@@ -14,3 +14,4 @@ ArmoryUtils:AddTrans("koKR", "LID_ILVLFONTSIZE", "아이템 레벨 글자 크기
 ArmoryUtils:AddTrans("koKR", "LID_SIDEFONTSIZE", "측면 텍스트 글자 크기: %s")
 ArmoryUtils:AddTrans("koKR", "LID_TOOLTIP", "툴팁")
 ArmoryUtils:AddTrans("koKR", "LID_SHOWITEMLEVEL", "아이템 레벨 표시")
+ArmoryUtils:AddTrans("koKR", "LID_LANGUAGE", "언어 / Language")

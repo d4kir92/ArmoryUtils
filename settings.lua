@@ -6,6 +6,105 @@ local DEFAULT_HEIGHT = 520
 local DEFAULT_ILVLFONTSIZE = 11
 local DEFAULT_SIDEFONTSIZE = 11
 local au_settings = nil
+ArmoryUtils.LANGUAGES = {{"English", "enUS"}, {"Deutsch", "deDE"}, {"Español (España)", "esES"}, {"Español (México)", "esMX"}, {"Français", "frFR"}, {"Italiano", "itIT"}, {"한국어", "koKR"}, {"Português (Brasil)", "ptBR"}, {"Русский", "ruRU"}, {"简体中文", "zhCN"}, {"繁體中文", "zhTW"}}
+local languageNames = {}
+for _, info in ipairs(ArmoryUtils.LANGUAGES) do
+    languageNames[info[2]] = info[1]
+end
+
+function ArmoryUtils:GetLanguage()
+    local lang = type(AUTAB) == "table" and AUTAB["LANGUAGE"] or nil
+    if languageNames[lang] then return lang end
+    return languageNames[GetLocale()] and GetLocale() or "enUS"
+end
+
+function ArmoryUtils:GetLanguageName()
+    return languageNames[ArmoryUtils:GetLanguage()]
+end
+
+local LibTrans = ArmoryUtils.Trans
+function ArmoryUtils:Trans(key, lang, ...)
+    return LibTrans(self, key, lang or ArmoryUtils:GetLanguage(), ...)
+end
+
+function ArmoryUtils:SetLanguage(lang)
+    if not languageNames[lang] or lang == ArmoryUtils:GetLanguage() or type(AUTAB) ~= "table" then return end
+    AUTAB["LANGUAGE"] = lang ~= GetLocale() and lang or nil
+    if not au_settings then return end
+    for _, refresh in ipairs(au_settings.languageRefresh) do refresh() end
+    au_settings.Language:SetText(ArmoryUtils:GetLanguageName())
+    au_settings.search.Hint:SetText(ArmoryUtils:Trans("LID_SEARCH"))
+    au_settings:Filter(au_settings.search:GetText())
+end
+
+local function AddLanguageSelector(window)
+    window.languageRefresh = {}
+    for _, method in ipairs({"AddCategory", "AddCheckbox", "AddSlider"}) do
+        local add = window[method]
+        window[method] = function(self, tab)
+            local key = tab.label
+            tab.label = ArmoryUtils:Trans(key)
+            local widget = add(self, tab)
+            local element = self.elements[#self.elements]
+            local function Refresh()
+                local text = ArmoryUtils:Trans(key)
+                if method == "AddSlider" then
+                    widget.Label:SetText(text .. ": " .. widget.slider:GetValue())
+                else
+                    widget.Label:SetText(text)
+                end
+                ArmoryUtils.UI:SetLabel(element, text)
+            end
+            if method == "AddSlider" then widget.slider:HookScript("OnValueChanged", Refresh) end
+            table.insert(self.languageRefresh, Refresh)
+            return widget
+        end
+    end
+
+    function window.LanguageMenu(_, root)
+        root:CreateTitle(ArmoryUtils:Trans("LID_LANGUAGE"))
+        for _, info in ipairs(ArmoryUtils.LANGUAGES) do
+            local lang = info[2]
+            root:CreateRadio(format("%s (%s)", info[1], lang), function() return ArmoryUtils:GetLanguage() == lang end, function() ArmoryUtils:SetLanguage(lang) end)
+        end
+    end
+
+    if ArmoryUtils:GetWoWBuild() == "RETAIL" and ArmoryUtils:CheckTemplates("WowStyle1DropdownTemplate") then
+        window.Language = CreateFrame("DropdownButton", "ArmoryUtilsSettings_Language", window.titleBar or window, "WowStyle1DropdownTemplate")
+        window.Language:SetScale(0.8)
+        window.Language:SetSize(162.5, 25)
+        window.Language:SetPoint("TOPLEFT", window.titleBar or window, "TOPLEFT", 10, -1.25)
+        window.Language:SetSelectionText(function() return ArmoryUtils:GetLanguageName() end)
+        window.Language:SetTooltip(function(tooltip) tooltip:SetText(ArmoryUtils:Trans("LID_LANGUAGE")) end)
+        window.Language:SetupMenu(window.LanguageMenu)
+    else
+        window.Language = ArmoryUtils:CreateButton("ArmoryUtilsSettings_Language", window.titleBar or window)
+        window.Language:SetSize(130, 20)
+        window.Language:SetPoint("TOPLEFT", window.titleBar or window, "TOPLEFT", 7, -2)
+        window.Language.Arrow = window.Language:CreateTexture(nil, "OVERLAY")
+        window.Language.Arrow:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
+        window.Language.Arrow:SetSize(16, 16)
+        window.Language.Arrow:SetPoint("RIGHT", window.Language, "RIGHT", -2, 0)
+        window.Language:SetScript("OnClick", function(button)
+            if MenuUtil and MenuUtil.CreateContextMenu then
+                MenuUtil.CreateContextMenu(button, window.LanguageMenu)
+            else
+                local current = 1
+                for i, info in ipairs(ArmoryUtils.LANGUAGES) do
+                    if info[2] == ArmoryUtils:GetLanguage() then current = i end
+                end
+                ArmoryUtils:SetLanguage(ArmoryUtils.LANGUAGES[current % #ArmoryUtils.LANGUAGES + 1][2])
+            end
+        end)
+        window.Language:SetScript("OnEnter", function(button)
+            GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+            GameTooltip:SetText(ArmoryUtils:Trans("LID_LANGUAGE"))
+            GameTooltip:Show()
+        end)
+        window.Language:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    end
+    window.Language:SetText(ArmoryUtils:GetLanguageName())
+end
 local function ShowMinimapButtonDefault()
     return ArmoryUtils:GetWoWBuild() ~= "RETAIL"
 end
@@ -63,6 +162,7 @@ function ArmoryUtils:InitSettings()
         ["title"] = format("|T%d:16:16:0:0|t ArmoryUtils v%s", ICON, ArmoryUtils:GetVersion())
     })
 
+    AddLanguageSelector(au_settings)
     au_settings:EnableKeyboard(true)
     au_settings:SetPropagateKeyboardInput(true)
     au_settings:SetScript("OnKeyDown", function(window, key)
@@ -73,7 +173,7 @@ function ArmoryUtils:InitSettings()
     au_settings:RegisterEvent("PLAYER_ENTERING_WORLD")
     au_settings:HookScript("OnEvent", function(window, event) if event == "PLAYER_ENTERING_WORLD" then window:Hide() end end)
     au_settings:SuspendLayout()
-    au_settings:AddSearch()
+    au_settings:AddSearch({["label"] = ArmoryUtils:Trans("LID_SEARCH")})
     au_settings:AddCategory({
         ["label"] = "LID_GENERAL",
         ["key"] = "GENERAL"

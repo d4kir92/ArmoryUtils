@@ -14,3 +14,4 @@ ArmoryUtils:AddTrans("ruRU", "LID_ILVLFONTSIZE", "Размер текста ур
 ArmoryUtils:AddTrans("ruRU", "LID_SIDEFONTSIZE", "Размер текста в боковых текстах: %s")
 ArmoryUtils:AddTrans("ruRU", "LID_TOOLTIP", "Подсказка")
 ArmoryUtils:AddTrans("ruRU", "LID_SHOWITEMLEVEL", "Показывать уровень предметов")
+ArmoryUtils:AddTrans("ruRU", "LID_LANGUAGE", "Язык / Language")
