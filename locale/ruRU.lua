@@ -15,3 +15,8 @@ ArmoryUtils:AddTrans("ruRU", "LID_SIDEFONTSIZE", "Размер текста в �
 ArmoryUtils:AddTrans("ruRU", "LID_TOOLTIP", "Подсказка")
 ArmoryUtils:AddTrans("ruRU", "LID_SHOWITEMLEVEL", "Показывать уровень предметов")
 ArmoryUtils:AddTrans("ruRU", "LID_LANGUAGE", "Язык / Language")
+ArmoryUtils:AddTrans("ruRU", "LID_ITEMLEVELCATEGORY", "Уровень предметов")
+ArmoryUtils:AddTrans("ruRU", "LID_ITEMLEVELEQUIPPEDTT", "Средний уровень надетой экипировки.")
+ArmoryUtils:AddTrans("ruRU", "LID_ITEMLEVELOVERALLTT", "Средний уровень лучшей имеющейся экипировки, включая ненадетые предметы.")
+ArmoryUtils:AddTrans("ruRU", "LID_ITEMLEVELEQUIPPED", "Надето")
+ArmoryUtils:AddTrans("ruRU", "LID_ITEMLEVELOVERALL", "Общий")

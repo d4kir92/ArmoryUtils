@@ -30,6 +30,7 @@ end
 function ArmoryUtils:SetLanguage(lang)
     if not languageNames[lang] or lang == ArmoryUtils:GetLanguage() or type(AUTAB) ~= "table" then return end
     AUTAB["LANGUAGE"] = lang ~= GetLocale() and lang or nil
+    if ArmoryUtils.UpdateItemLevelCategory then ArmoryUtils:UpdateItemLevelCategory() end
     if not au_settings then return end
     for _, refresh in ipairs(au_settings.languageRefresh) do refresh() end
     au_settings.Language:SetText(ArmoryUtils:GetLanguageName())

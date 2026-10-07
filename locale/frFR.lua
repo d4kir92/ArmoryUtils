@@ -15,3 +15,8 @@ ArmoryUtils:AddTrans("frFR", "LID_SIDEFONTSIZE", "Taille des textes latéraux : 
 ArmoryUtils:AddTrans("frFR", "LID_TOOLTIP", "Infobulle")
 ArmoryUtils:AddTrans("frFR", "LID_SHOWITEMLEVEL", "Afficher le niveau d'objet")
 ArmoryUtils:AddTrans("frFR", "LID_LANGUAGE", "Langue / Language")
+ArmoryUtils:AddTrans("frFR", "LID_ITEMLEVELCATEGORY", "Niveau d'objet")
+ArmoryUtils:AddTrans("frFR", "LID_ITEMLEVELEQUIPPEDTT", "Niveau moyen des objets actuellement équipés.")
+ArmoryUtils:AddTrans("frFR", "LID_ITEMLEVELOVERALLTT", "Niveau moyen de vos meilleurs objets disponibles, y compris ceux qui ne sont pas équipés.")
+ArmoryUtils:AddTrans("frFR", "LID_ITEMLEVELEQUIPPED", "Équipé")
+ArmoryUtils:AddTrans("frFR", "LID_ITEMLEVELOVERALL", "Global")

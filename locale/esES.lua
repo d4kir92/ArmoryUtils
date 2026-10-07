@@ -15,3 +15,8 @@ ArmoryUtils:AddTrans("esES", "LID_SIDEFONTSIZE", "Tamaño de los textos laterale
 ArmoryUtils:AddTrans("esES", "LID_TOOLTIP", "Información")
 ArmoryUtils:AddTrans("esES", "LID_SHOWITEMLEVEL", "Mostrar nivel de objeto")
 ArmoryUtils:AddTrans("esES", "LID_LANGUAGE", "Idioma / Language")
+ArmoryUtils:AddTrans("esES", "LID_ITEMLEVELCATEGORY", "Nivel de objeto")
+ArmoryUtils:AddTrans("esES", "LID_ITEMLEVELEQUIPPEDTT", "Nivel de objeto medio de tu equipo actual.")
+ArmoryUtils:AddTrans("esES", "LID_ITEMLEVELOVERALLTT", "Nivel de objeto medio de tu mejor equipo disponible, incluidos los objetos que no llevas equipados.")
+ArmoryUtils:AddTrans("esES", "LID_ITEMLEVELEQUIPPED", "Equipado")
+ArmoryUtils:AddTrans("esES", "LID_ITEMLEVELOVERALL", "General")

@@ -561,7 +561,10 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             if frame.ilvl then frame.ilvl:SetText("") end
         end
 
-        if statsPaneValue == nil and frame.ilvl == nil and ArmoryUtils:GetName(frame) then
+        local hideFloatingItemLevel = prefix == "Character" and ArmoryUtils:IsForever()
+        if hideFloatingItemLevel and frame.ilvl then frame.ilvl:SetText("") end
+
+        if not hideFloatingItemLevel and statsPaneValue == nil and frame.ilvl == nil and ArmoryUtils:GetName(frame) then
             local mainFrame = _G[prefix .. "Frame"] or frame
             local anchor = _G[prefix .. "NameFrame"]
             local offset = 22
@@ -603,7 +606,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
                     end
 
                     statsPaneValue:SetText(ArmoryUtils:GetAUILVL())
-                elseif frame.ilvl then
+                elseif frame.ilvl and not hideFloatingItemLevel then
                     frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": |r" .. ArmoryUtils:GetAUILVL())
                 end
             end
@@ -611,7 +614,7 @@ function ArmoryUtils:UpdateChar(frame, unit, prefix, func)
             if unit ~= "player" then lastInspectGUID = nil end
         elseif statsPaneValue then
             if ArmoryUtils:GetAUILVL() then statsPaneValue:SetText(ArmoryUtils:GetAUILVL()) end
-        elseif frame.ilvl then
+        elseif frame.ilvl and not hideFloatingItemLevel then
             frame.ilvl:SetText("|cFFFFFF00" .. ITEM_LEVEL_ABBR .. ": " .. "|cFFFF0000?")
         end
     end
@@ -797,7 +800,56 @@ function ArmoryUtils:WaitForInspectFrame()
     end, "IFThink")
 end
 
+function ArmoryUtils:UpdateItemLevelCategory()
+    local category = ArmoryUtils.itemLevelCategory
+    if not category then return end
+    local possible, equipped
+    if GetAverageItemLevel then possible, equipped = GetAverageItemLevel() end
+    if ArmoryUtils:IsSecret(possible) then possible = nil end
+    if ArmoryUtils:IsSecret(equipped) then equipped = nil end
+    if type(equipped) ~= "number" then equipped = tonumber(ArmoryUtils:GetAUILVL()) end
+    category.Header.Title:SetText(ArmoryUtils:Trans("LID_ITEMLEVELCATEGORY"))
+    category.Equipped.Label:SetText(format(STAT_FORMAT, ArmoryUtils:Trans("LID_ITEMLEVELEQUIPPED")))
+    category.Equipped.Value:SetText(type(equipped) == "number" and tostring(math.floor(equipped)) or "-")
+    category.Possible.Label:SetText(format(STAT_FORMAT, ArmoryUtils:Trans("LID_ITEMLEVELOVERALL")))
+    category.Possible.Value:SetText(type(possible) == "number" and tostring(math.floor(possible)) or "-")
+    category.Equipped.tooltip = "|cffffffff" .. format(STAT_FORMAT, ArmoryUtils:Trans("LID_ITEMLEVELEQUIPPED")) .. " " .. (type(equipped) == "number" and string.format("%.2f", equipped) or "-") .. "|r"
+    category.Equipped.tooltip2 = ArmoryUtils:Trans("LID_ITEMLEVELEQUIPPEDTT")
+    category.Possible.tooltip = "|cffffffff" .. format(STAT_FORMAT, ArmoryUtils:Trans("LID_ITEMLEVELOVERALL")) .. " " .. (type(possible) == "number" and string.format("%.2f", possible) or "-") .. "|r"
+    category.Possible.tooltip2 = ArmoryUtils:Trans("LID_ITEMLEVELOVERALLTT")
+end
+
+function ArmoryUtils:InitItemLevelCategory()
+    local pane = CharacterStatsPaneScrollBox
+    if not ArmoryUtils:IsForever() or not pane or not pane.ScrollBox or ArmoryUtils.itemLevelCategory then return end
+    local category = CreateFrame("Frame", nil, pane)
+    ArmoryUtils.itemLevelCategory = category
+    category:SetPoint("TOPLEFT", pane, "TOPLEFT", 10, -8)
+    category:SetPoint("TOPRIGHT", pane, "TOPRIGHT", -30, -8)
+    category:SetHeight(86)
+    category.Header = CreateFrame("Frame", nil, category, "CharacterStatFrameCategoryTemplate")
+    category.Header:SetPoint("TOP", category, "TOP", 0, 0)
+    category.Equipped = CreateFrame("Frame", nil, category, "CharacterStatFrameScrollBoxLabelElementTemplate")
+    category.Possible = CreateFrame("Frame", nil, category, "CharacterStatFrameScrollBoxLabelElementTemplate")
+    category.Possible:SetPoint("TOP", category.Header, "BOTTOM", 0, 0)
+    category.Equipped:SetPoint("TOP", category.Possible, "BOTTOM", 0, 0)
+    category.Equipped:EnableMouse(true)
+    category.Possible:EnableMouse(true)
+    category.Equipped.Background:Hide()
+    category.Possible.Background:Show()
+    pane.ScrollBox:SetPoint("TOPLEFT", pane, "TOPLEFT", 10, -94)
+    pane:HookScript("OnShow", function() ArmoryUtils:UpdateItemLevelCategory() end)
+    local events = CreateFrame("Frame")
+    for _, event in ipairs({"PLAYER_AVG_ITEM_LEVEL_UPDATE", "PLAYER_EQUIPMENT_CHANGED", "BAG_UPDATE_DELAYED", "GET_ITEM_INFO_RECEIVED"}) do
+        ArmoryUtils:RegisterEvent(events, event)
+    end
+    events:SetScript("OnEvent", function()
+        if pane:IsShown() then ArmoryUtils:UpdateItemLevelCategory() end
+    end)
+    ArmoryUtils:UpdateItemLevelCategory()
+end
 function ArmoryUtils:InitItemLevel()
+    ArmoryUtils:InitItemLevelCategory()
     if ArmoryUtils:DBGV("ITEMLEVELSYSTEM", true) and PaperDollFrame then
         for i, slot in pairs(AUCharSlots) do
             ArmoryUtils:AddIlvl("Character", _G["Character" .. slot], i)

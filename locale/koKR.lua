@@ -15,3 +15,8 @@ ArmoryUtils:AddTrans("koKR", "LID_SIDEFONTSIZE", "측면 텍스트 글자 크기
 ArmoryUtils:AddTrans("koKR", "LID_TOOLTIP", "툴팁")
 ArmoryUtils:AddTrans("koKR", "LID_SHOWITEMLEVEL", "아이템 레벨 표시")
 ArmoryUtils:AddTrans("koKR", "LID_LANGUAGE", "언어 / Language")
+ArmoryUtils:AddTrans("koKR", "LID_ITEMLEVELCATEGORY", "아이템 레벨")
+ArmoryUtils:AddTrans("koKR", "LID_ITEMLEVELEQUIPPEDTT", "현재 착용 중인 장비의 평균 아이템 레벨입니다.")
+ArmoryUtils:AddTrans("koKR", "LID_ITEMLEVELOVERALLTT", "착용하지 않은 아이템을 포함하여 보유한 최고의 장비의 평균 아이템 레벨입니다.")
+ArmoryUtils:AddTrans("koKR", "LID_ITEMLEVELEQUIPPED", "착용")
+ArmoryUtils:AddTrans("koKR", "LID_ITEMLEVELOVERALL", "전체")

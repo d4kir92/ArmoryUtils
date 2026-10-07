@@ -15,3 +15,8 @@ ArmoryUtils:AddTrans("deDE", "LID_SIDEFONTSIZE", "Seitliche Texte Textgröße: %
 ArmoryUtils:AddTrans("deDE", "LID_TOOLTIP", "Tooltip")
 ArmoryUtils:AddTrans("deDE", "LID_SHOWITEMLEVEL", "Itemlevel anzeigen")
 ArmoryUtils:AddTrans("deDE", "LID_LANGUAGE", "Sprache / Language")
+ArmoryUtils:AddTrans("deDE", "LID_ITEMLEVELCATEGORY", "Itemlevel")
+ArmoryUtils:AddTrans("deDE", "LID_ITEMLEVELEQUIPPEDTT", "Durchschnittlicher Itemlevel deiner aktuell angelegten Ausrüstung.")
+ArmoryUtils:AddTrans("deDE", "LID_ITEMLEVELOVERALLTT", "Durchschnittlicher Itemlevel deiner besten vorhandenen Ausrüstung, einschließlich nicht angelegter Gegenstände.")
+ArmoryUtils:AddTrans("deDE", "LID_ITEMLEVELEQUIPPED", "Angelegt")
+ArmoryUtils:AddTrans("deDE", "LID_ITEMLEVELOVERALL", "Gesamt")
