@@ -91,72 +91,21 @@ if LE_UNIT_STAT_STRENGTH and LE_UNIT_STAT_AGILITY and LE_UNIT_STAT_INTELLECT the
     AUPrimaryStatKeys[LE_UNIT_STAT_INTELLECT] = STAT_INT
 end
 
-local AUSpecPrimaryStat = {
-    [250] = STAT_STR,
-    [251] = STAT_STR,
-    [252] = STAT_STR,
-    [66] = STAT_STR,
-    [70] = STAT_STR,
-    [71] = STAT_STR,
-    [72] = STAT_STR,
-    [73] = STAT_STR,
-    [577] = STAT_AGI,
-    [581] = STAT_AGI,
-    [103] = STAT_AGI,
-    [104] = STAT_AGI,
-    [253] = STAT_AGI,
-    [254] = STAT_AGI,
-    [255] = STAT_AGI,
-    [268] = STAT_AGI,
-    [269] = STAT_AGI,
-    [259] = STAT_AGI,
-    [260] = STAT_AGI,
-    [261] = STAT_AGI,
-    [263] = STAT_AGI,
-    [1480] = STAT_INT,
-    [102] = STAT_INT,
-    [105] = STAT_INT,
-    [1467] = STAT_INT,
-    [1468] = STAT_INT,
-    [1473] = STAT_INT,
-    [62] = STAT_INT,
-    [63] = STAT_INT,
-    [64] = STAT_INT,
-    [270] = STAT_INT,
-    [65] = STAT_INT,
-    [256] = STAT_INT,
-    [257] = STAT_INT,
-    [258] = STAT_INT,
-    [262] = STAT_INT,
-    [264] = STAT_INT,
-    [265] = STAT_INT,
-    [266] = STAT_INT,
-    [267] = STAT_INT
-}
-
-local function GetSpecStatKey(unit)
-    if C_SpecializationInfo == nil then return nil end
-    if unit == "player" then
-        if C_SpecializationInfo.GetSpecialization == nil or C_SpecializationInfo.GetSpecializationInfo == nil then return nil end
-        local spec = C_SpecializationInfo.GetSpecialization()
-        if spec == nil then return nil end
-        local primaryStat = select(6, C_SpecializationInfo.GetSpecializationInfo(spec, false, false, nil, UnitSex("player")))
-        if primaryStat == nil then return nil end
-        return AUPrimaryStatKeys[primaryStat]
-    end
-
-    local getInspectSpec = C_SpecializationInfo.GetInspectSpecialization or GetInspectSpecialization
-    if getInspectSpec == nil then return nil end
-    local specID = getInspectSpec(unit)
-    if specID == nil or ArmoryUtils:IsSecret(specID) then return nil end
-    return AUSpecPrimaryStat[specID]
+local function GetSpecStatKey()
+    if C_SpecializationInfo == nil or C_SpecializationInfo.GetSpecialization == nil or C_SpecializationInfo.GetSpecializationInfo == nil then return nil end
+    local spec = C_SpecializationInfo.GetSpecialization()
+    if spec == nil then return nil end
+    local primaryStat = select(6, C_SpecializationInfo.GetSpecializationInfo(spec, false, false, nil, UnitSex("player")))
+    if primaryStat == nil then return nil end
+    return AUPrimaryStatKeys[primaryStat]
 end
 
 local function GetWrongStatText(unit, slotId, link)
+    if unit ~= "player" then return nil end
     if ArmoryUtils:GetWoWBuild() ~= "RETAIL" or ArmoryUtils:IsForever() or slotId == 4 or slotId == 19 then return nil end
     if not ArmoryUtils:DBGV("WRONGPRIMARYSTAT", true) then return nil end
     if type(link) ~= "string" or C_Item == nil or C_Item.GetItemStats == nil then return nil end
-    local specKey = GetSpecStatKey(unit)
+    local specKey = GetSpecStatKey()
     if specKey == nil then return nil end
     local stats = C_Item.GetItemStats(link)
     if stats == nil or stats[specKey] then return nil end
