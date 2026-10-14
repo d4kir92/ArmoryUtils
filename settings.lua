@@ -1,6 +1,5 @@
 local _, ArmoryUtils = ...
-local ICON = 134952
-local VERSION = "1.3.19"
+local ICON = ArmoryUtils:GetAddonIcon()
 local DEFAULT_WIDTH = 460
 local DEFAULT_HEIGHT = 520
 local DEFAULT_ILVLFONTSIZE = 11
@@ -311,8 +310,8 @@ ArmoryUtils:RegisterEvent(AUTABSetup, "PLAYER_LOGIN")
 AUTABSetup:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
         AUTAB = AUTAB or {}
-        ArmoryUtils:SetVersion(ICON, VERSION)
-        ArmoryUtils:SetAddonOutput("ArmoryUtils", ICON)
+        ArmoryUtils:SetVersion()
+        ArmoryUtils:SetAddonOutput()
         ArmoryUtils:CreateMinimapButton({
             ["name"] = "ArmoryUtils",
             ["icon"] = ICON,
